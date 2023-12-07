@@ -12,5 +12,5 @@ interface ShoppingListRepository : MongoRepository<ShoppingList, String> {
 
     fun findByIdUser(idUser: String, sort: Sort, limit: Limit): List<ShoppingList>
 
-    fun findByIdUserAndIdShoppingList(idUser: String, idShoppingList: String): ShoppingList
+    fun findByIdUserAndIdShoppingList(idUser: String, idShoppingList: String): ShoppingList?
 }

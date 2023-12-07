@@ -27,6 +27,7 @@ class ShoppingListService(private val repository: ShoppingListRepository) {
     fun updateShoppingList(dto: ShoppingListDto): ShoppingListDto {
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val oldEntity = repository.findByIdUserAndIdShoppingList(dto.idUser, dto.idShoppingList)
+            ?: throw Exception("Shopping list not found")
         val entity = dto.toEntity(newItemVersion, oldEntity.internalId)
         repository.save(entity)
         return ShoppingListDto.fromEntity(entity)

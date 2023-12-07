@@ -27,6 +27,7 @@ class FinishedSpendingService(private val repository: FinishedSpendingRepository
     fun updateFinishedSpending(dto: FinishedSpendingDto): FinishedSpendingDto {
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val oldEntity = repository.findByIdUserAndIdSpendingSummary(dto.idUser, dto.spendingSummary.idSpendingSummary)
+            ?: throw Exception("Finished spending not found")
         val entity = dto.toEntity(newItemVersion, oldEntity.internalId)
         repository.save(entity)
         return FinishedSpendingDto.fromEntity(entity)
