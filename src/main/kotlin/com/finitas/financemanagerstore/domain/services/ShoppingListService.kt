@@ -3,6 +3,8 @@ package com.finitas.financemanagerstore.domain.services
 import com.finitas.financemanagerstore.api.dto.ShoppingListDto
 import com.finitas.financemanagerstore.api.dto.SynchronizationRequest
 import com.finitas.financemanagerstore.api.dto.SynchronizationResponse
+import com.finitas.financemanagerstore.config.BadRequestException
+import com.finitas.financemanagerstore.config.NotFoundException
 import com.finitas.financemanagerstore.domain.model.ShoppingList
 import com.finitas.financemanagerstore.domain.repositories.ShoppingListRepository
 import org.springframework.data.domain.Limit
@@ -27,8 +29,17 @@ class ShoppingListService(private val repository: ShoppingListRepository) {
     fun updateShoppingList(dto: ShoppingListDto): ShoppingListDto {
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val oldEntity = repository.findByIdUserAndIdShoppingList(dto.idUser, dto.idShoppingList)
-            ?: throw Exception("Shopping list not found")
+            ?: throw NotFoundException("Shopping list not found")
         val entity = dto.toEntity(newItemVersion, oldEntity.internalId)
+        repository.save(entity)
+        return ShoppingListDto.fromEntity(entity)
+    }
+
+    @Transactional
+    fun deleteShoppingList(idUser: String, idShoppingList: String): ShoppingListDto {
+        val entity = repository.findByIdUserAndIdShoppingList(idUser, idShoppingList)
+            ?: throw NotFoundException("Shopping list not found")
+        entity.isDeleted = 1
         repository.save(entity)
         return ShoppingListDto.fromEntity(entity)
     }
@@ -49,7 +60,7 @@ class ShoppingListService(private val repository: ShoppingListRepository) {
 
     @Transactional
     fun synchronize(dto: SynchronizationRequest<ShoppingListDto>): SynchronizationResponse<ShoppingListDto> {
-        val userId = dto.objects.firstOrNull()?.idUser ?: throw Exception("No data to update provided")
+        val userId = dto.objects.firstOrNull()?.idUser ?: throw BadRequestException("No data to update provided")
 
         val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(userId, dto.lastSyncVersion)
         val serverChangedItemsAssociatedByIds = itemsChangedAfterLastSync.associateBy { it.idShoppingList }

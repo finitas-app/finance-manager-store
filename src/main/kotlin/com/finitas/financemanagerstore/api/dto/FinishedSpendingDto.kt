@@ -4,15 +4,29 @@ import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import com.finitas.financemanagerstore.domain.model.Receipt
 import com.finitas.financemanagerstore.domain.model.SpendingRecord
 import com.finitas.financemanagerstore.domain.model.SpendingSummary
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
 import org.springframework.core.io.ByteArrayResource
 import javax.sql.rowset.serial.SerialBlob
 
+data class DeleteFinishedSpendingRequest (
+    @NotBlank
+    val idSpendingSummary: String,
+    @NotBlank
+    val idUser: String,
+)
+
 data class FinishedSpendingDto(
+    @Min(0)
     val version: Int,
+    @NotBlank
     val idUser: String,
     val spendingSummary: SpendingSummaryDto,
     val receipt: ReceiptDto?,
+    @Min(0)
     val purchaseData: Int,
+    @Min(0) @Max(1)
     val isDeleted: Int,
 ) {
     companion object {
@@ -39,8 +53,11 @@ data class FinishedSpendingDto(
 }
 
 data class SpendingSummaryDto(
+    @NotBlank
     val idSpendingSummary: String,
+    @Min(1)
     val createdAt: Int,
+    @NotBlank
     val name: String,
     val spendingRecords: List<SpendingRecordDto>,
 ) {
@@ -62,6 +79,7 @@ data class SpendingSummaryDto(
 }
 
 data class ReceiptDto(
+    @NotBlank
     val idReceipt: String,
     val photo: ByteArrayResource,
 ) {
@@ -81,6 +99,7 @@ data class ReceiptDto(
 }
 
 data class SpendingRecordDto(
+    @NotBlank
     val idSpendingRecord: String,
     val spendingRecordData: SpendingRecordDataDto,
 ) {

@@ -4,6 +4,7 @@ import com.finitas.financemanagerstore.api.dto.GetVisibleNamesRequest
 import com.finitas.financemanagerstore.api.dto.IdUserWithVisibleName
 import com.finitas.financemanagerstore.api.dto.RegularSpendingDto
 import com.finitas.financemanagerstore.api.dto.UserDto
+import com.finitas.financemanagerstore.config.NotFoundException
 import com.finitas.financemanagerstore.domain.model.User
 import com.finitas.financemanagerstore.domain.repositories.UserRepository
 import org.springframework.stereotype.Component
@@ -22,7 +23,7 @@ class UserService(private val repository: UserRepository) {
         val userFromRepo = repository.findById(idUser)
 
         if (userFromRepo.isEmpty) {
-            throw Exception("User not found")
+            throw NotFoundException("User not found")
         }
 
         val prevUserState = userFromRepo.get()

@@ -3,6 +3,8 @@ package com.finitas.financemanagerstore.domain.services
 import com.finitas.financemanagerstore.api.dto.FinishedSpendingDto
 import com.finitas.financemanagerstore.api.dto.SynchronizationRequest
 import com.finitas.financemanagerstore.api.dto.SynchronizationResponse
+import com.finitas.financemanagerstore.config.BadRequestException
+import com.finitas.financemanagerstore.config.NotFoundException
 import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import com.finitas.financemanagerstore.domain.repositories.FinishedSpendingRepository
 import org.springframework.data.domain.Limit
@@ -27,8 +29,17 @@ class FinishedSpendingService(private val repository: FinishedSpendingRepository
     fun updateFinishedSpending(dto: FinishedSpendingDto): FinishedSpendingDto {
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val oldEntity = repository.findByIdUserAndIdSpendingSummary(dto.idUser, dto.spendingSummary.idSpendingSummary)
-            ?: throw Exception("Finished spending not found")
+            ?: throw NotFoundException("Finished spending not found")
         val entity = dto.toEntity(newItemVersion, oldEntity.internalId)
+        repository.save(entity)
+        return FinishedSpendingDto.fromEntity(entity)
+    }
+
+    @Transactional
+    fun deleteFinishedSpending(idUser: String, idSpendingSummary: String): FinishedSpendingDto {
+        val entity = repository.findByIdUserAndIdSpendingSummary(idUser, idSpendingSummary)
+            ?: throw NotFoundException("Finished spending not found")
+        entity.isDeleted = 1
         repository.save(entity)
         return FinishedSpendingDto.fromEntity(entity)
     }
@@ -49,7 +60,7 @@ class FinishedSpendingService(private val repository: FinishedSpendingRepository
 
     @Transactional
     fun synchronize(dto: SynchronizationRequest<FinishedSpendingDto>): SynchronizationResponse<FinishedSpendingDto> {
-        val userId = dto.objects.firstOrNull()?.idUser ?: throw Exception("No data to update provided")
+        val userId = dto.objects.firstOrNull()?.idUser ?: throw BadRequestException("No data to update provided")
 
         val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(userId, dto.lastSyncVersion)
         val serverChangedItemsAssociatedByIds = itemsChangedAfterLastSync.associateBy { it.idSpendingSummary }

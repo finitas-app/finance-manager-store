@@ -2,12 +2,28 @@ package com.finitas.financemanagerstore.api.dto
 
 import com.finitas.financemanagerstore.domain.model.ShoppingItem
 import com.finitas.financemanagerstore.domain.model.ShoppingList
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
+
+data class DeleteShoppingListRequest (
+    @NotBlank
+    val idShoppingItem: String,
+    @NotBlank
+    val idUser: String,
+)
 
 data class ShoppingListDto(
+    @NotBlank
     val idShoppingList: String,
+    @Size(min = 1)
     val shoppingItems: List<ShoppingItemDto>,
+    @NotBlank
     val idUser: String,
+    @Min(0) @Max(1)
     val isDeleted: Int,
+    @Min(0)
     val version: Int,
 ) {
     companion object {
@@ -31,7 +47,9 @@ data class ShoppingListDto(
 }
 
 data class ShoppingItemDto(
+    @NotBlank
     val idShoppingItem: String,
+    @Min(0) @Max(1)
     val isDone: Int,
     val spendingRecordData: SpendingRecordDataDto,
 ) {

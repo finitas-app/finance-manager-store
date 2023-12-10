@@ -27,7 +27,7 @@ class FinishedSpending(
     val idSpendingSummary: String,
     val version: Int,
     val idUser: String,
-    val isDeleted: Int,
+    var isDeleted: Int,
     val spendingSummary: SpendingSummary,
     val receipt: Receipt?,
     val purchaseData: Int,

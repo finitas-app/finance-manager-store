@@ -2,11 +2,15 @@ package com.finitas.financemanagerstore.api.dto
 
 import com.finitas.financemanagerstore.domain.model.Category
 import com.finitas.financemanagerstore.domain.model.SpendingRecordData
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
 import java.math.BigDecimal
 
 data class ResponseMessage(val message: String)
 
 data class SynchronizationRequest<T>(
+    @Min(0)
     val lastSyncVersion: Int,
     val isAuthorDataToUpdate: Boolean,
     val objects: List<T>
@@ -18,8 +22,11 @@ data class SynchronizationResponse<T>(
 )
 
 data class SpendingRecordDataDto(
+    @NotBlank
     val idSpendingRecordData: String,
+    @NotBlank
     val name: String,
+    @Min(0)
     val price: BigDecimal,
     val category: CategoryDto,
 ) {
@@ -41,8 +48,11 @@ data class SpendingRecordDataDto(
 }
 
 data class CategoryDto(
+    @NotBlank
     val idCategory: String,
+    @NotBlank
     val name: String,
+    @NotBlank
     val idParent: String?,
 ) {
     companion object {

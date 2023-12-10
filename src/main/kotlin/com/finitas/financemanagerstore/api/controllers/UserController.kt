@@ -2,6 +2,7 @@ package com.finitas.financemanagerstore.api.controllers
 
 import com.finitas.financemanagerstore.api.dto.*
 import com.finitas.financemanagerstore.domain.services.UserService
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 class UserController(private val service: UserService) {
 
     @PutMapping
-    fun upsertUser(@RequestBody request: UserDto): ResponseMessage {
+    fun upsertUser(@Valid @RequestBody request: UserDto): ResponseMessage {
         service.upsertUser(request)
         return ResponseMessage("success")
     }
@@ -17,14 +18,14 @@ class UserController(private val service: UserService) {
     @PostMapping("{idUser}/regular-spendings")
     fun addRegularSpendings(
         @PathVariable idUser: String,
-        @RequestBody regularSpendings: List<RegularSpendingDto>
+        @Valid @RequestBody regularSpendings: List<RegularSpendingDto>
     ): ResponseMessage {
         service.addNewRegularSpendings(idUser, regularSpendings)
         return ResponseMessage("success")
     }
 
     @GetMapping("nicknames")
-    fun getNicknames(@RequestBody request: GetVisibleNamesRequest): List<IdUserWithVisibleName> {
+    fun getNicknames(@Valid @RequestBody request: GetVisibleNamesRequest): List<IdUserWithVisibleName> {
         return service.getVisibleNames(request)
     }
 }

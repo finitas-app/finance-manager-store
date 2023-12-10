@@ -16,5 +16,5 @@ class ShoppingList(
     val version: Int,
     val shoppingItems: List<ShoppingItem>,
     val idUser: String,
-    val isDeleted: Int,
+    var isDeleted: Int,
 )
