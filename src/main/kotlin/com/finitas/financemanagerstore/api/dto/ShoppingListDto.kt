@@ -7,24 +7,23 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
-data class DeleteShoppingListRequest (
-    @NotBlank
-    val idShoppingItem: String,
-    @NotBlank
+data class DeleteShoppingListRequest(
+    @field:NotBlank(message = "idShoppingList should not be blank")
+    val idShoppingList: String,
+    @field:NotBlank(message = "idUser should not be blank")
     val idUser: String,
 )
 
-data class ShoppingListDto(
-    @NotBlank
+class ShoppingListDto(
+    @field:NotBlank(message = "idShoppingList should not be blank")
     val idShoppingList: String,
-    @Size(min = 1)
+    @field:Size(min = 1, message = "idShoppingList should not be empty")
     val shoppingItems: List<ShoppingItemDto>,
-    @NotBlank
-    val idUser: String,
-    @Min(0) @Max(1)
-    val isDeleted: Int,
-    @Min(0)
+    @field:Min(0, message = "version should be a non negative integer")
     val version: Int,
+    @field:NotBlank(message = "idUser should not be blank")
+    val idUser: String,
+    val isDeleted: Boolean,
 ) {
     companion object {
         fun fromEntity(entity: ShoppingList) = ShoppingListDto(
@@ -47,9 +46,10 @@ data class ShoppingListDto(
 }
 
 data class ShoppingItemDto(
-    @NotBlank
+    @field:NotBlank(message = "idShoppingItem should not be blank")
     val idShoppingItem: String,
-    @Min(0) @Max(1)
+    @field:Min(0, message = "isDone flag can be of value 0 or 1")
+    @field:Max(1, message = "isDone flag can be of value 0 or 1")
     val isDone: Int,
     val spendingRecordData: SpendingRecordDataDto,
 ) {

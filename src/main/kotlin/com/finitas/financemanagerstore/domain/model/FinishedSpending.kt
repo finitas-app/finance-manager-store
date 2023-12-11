@@ -1,6 +1,7 @@
 package com.finitas.financemanagerstore.domain.model
 
-import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 import java.sql.Blob
 
@@ -22,13 +23,24 @@ class SpendingSummary(
 )
 
 @Document("finishedSpendings")
+@CompoundIndexes(
+    CompoundIndex(
+        name = "idUserWithIdSpendingSummary",
+        def = "{'spendingSummary.idSpendingSummary' : 1, 'idUser' : 1}",
+        unique = true
+    )
+)
 class FinishedSpending(
-    @Id val internalId: String,
-    val idSpendingSummary: String,
-    val version: Int,
-    val idUser: String,
-    var isDeleted: Int,
     val spendingSummary: SpendingSummary,
     val receipt: Receipt?,
-    val purchaseData: Int,
+    val purchaseDate: Int,
+    internalId: String,
+    version: Int,
+    idUser: String,
+    isDeleted: Boolean,
+) : AbstractSpending(
+    internalId = internalId,
+    version = version,
+    idUser = idUser,
+    isDeleted = isDeleted,
 )

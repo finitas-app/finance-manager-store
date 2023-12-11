@@ -2,17 +2,19 @@ package com.finitas.financemanagerstore.api.dto
 
 import com.finitas.financemanagerstore.domain.model.Category
 import com.finitas.financemanagerstore.domain.model.SpendingRecordData
-import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 
 data class ResponseMessage(val message: String)
+data class UpdateResponse(val lastSyncVersion: Int)
 
 data class SynchronizationRequest<T>(
-    @Min(0)
+    @field:Min(0, message = "lastSyncVersion should be a non negative integer")
     val lastSyncVersion: Int,
     val isAuthorDataToUpdate: Boolean,
+    @field:Size(min = 1, message = "Update data list should not be empty")
     val objects: List<T>
 )
 
@@ -22,11 +24,11 @@ data class SynchronizationResponse<T>(
 )
 
 data class SpendingRecordDataDto(
-    @NotBlank
+    @field:NotBlank(message = "idSpendingRecordData should not be blank")
     val idSpendingRecordData: String,
-    @NotBlank
+    @field:NotBlank(message = "name should not be blank")
     val name: String,
-    @Min(0)
+    @field:Min(0, message = "price should be a non negative integer")
     val price: BigDecimal,
     val category: CategoryDto,
 ) {
@@ -48,11 +50,11 @@ data class SpendingRecordDataDto(
 }
 
 data class CategoryDto(
-    @NotBlank
+    @field:NotBlank(message = "idCategory should not be blank")
     val idCategory: String,
-    @NotBlank
+    @field:NotBlank(message = "name should not be blank")
     val name: String,
-    @NotBlank
+    @field:NotBlank(message = "idParent should not be blank")
     val idParent: String?,
 ) {
     companion object {

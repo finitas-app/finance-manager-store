@@ -20,14 +20,9 @@ class UserService(private val repository: UserRepository) {
 
     @Transactional
     fun addNewRegularSpendings(idUser: String, newSpendings: List<RegularSpendingDto>) {
-        val userFromRepo = repository.findById(idUser)
+        val userFromRepo = repository.findByIdUser(idUser).firstOrNull() ?: throw NotFoundException("User not found")
 
-        if (userFromRepo.isEmpty) {
-            throw NotFoundException("User not found")
-        }
-
-        val prevUserState = userFromRepo.get()
-        val spendingGroupedById = prevUserState.regularSpendings.associateBy { it.idRegularSpending }.toMutableMap()
+        val spendingGroupedById = userFromRepo.regularSpendings.associateBy { it.idRegularSpending }.toMutableMap()
         newSpendings.forEach {
             spendingGroupedById[it.idRegularSpending] = it.toEntity()
         }
@@ -35,12 +30,13 @@ class UserService(private val repository: UserRepository) {
         repository.save(
             User(
                 idUser = idUser,
-                visibleName = prevUserState.visibleName,
+                visibleName = userFromRepo.visibleName,
+                internalId = userFromRepo.internalId,
                 regularSpendings = spendingGroupedById.values.toList()
             )
         )
     }
 
     fun getVisibleNames(request: GetVisibleNamesRequest) =
-        repository.findAllById(request.userIds).map { IdUserWithVisibleName(it.idUser, it.visibleName) }
+        repository.findByIdUserIn(request.userIds).map { IdUserWithVisibleName(it.idUser, it.visibleName) }
 }

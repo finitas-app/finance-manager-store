@@ -5,7 +5,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document("users")
 class User(
-    @Id val idUser: String,
+    @Id val internalId: String,
+    val idUser: String,
     val visibleName: String,
     val regularSpendings: List<RegularSpending>
 )

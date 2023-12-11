@@ -12,5 +12,9 @@ interface FinishedSpendingRepository : MongoRepository<FinishedSpending, String>
 
     fun findByIdUser(idUser: String, sort: Sort, limit: Limit): List<FinishedSpending>
 
-    fun findByIdUserAndIdSpendingSummary(idUser: String, idSpendingSummary: String): FinishedSpending?
+    fun findAllByIdUser(idUser: String): List<FinishedSpending>
+
+    fun findByIdUserAndSpendingSummaryIdSpendingSummary(idUser: String, idSpendingSummary: String): FinishedSpending?
+
+    fun existsByIdUserAndSpendingSummaryIdSpendingSummary(idUser: String, idSpendingSummary: String): Boolean
 }

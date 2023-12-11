@@ -1,6 +1,7 @@
 package com.finitas.financemanagerstore.domain.model
 
-import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 
 class ShoppingItem(
@@ -10,11 +11,19 @@ class ShoppingItem(
 )
 
 @Document("shoppingLists")
+@CompoundIndexes(
+    CompoundIndex(name = "idUserWithIdShoppingList", def = "{'idShoppingList' : 1, 'idUser' : 1}", unique = true)
+)
 class ShoppingList(
-    @Id val internalId: String,
     val idShoppingList: String,
-    val version: Int,
     val shoppingItems: List<ShoppingItem>,
-    val idUser: String,
-    var isDeleted: Int,
+    internalId: String,
+    version: Int,
+    idUser: String,
+    isDeleted: Boolean,
+) : AbstractSpending(
+    internalId = internalId,
+    version = version,
+    idUser = idUser,
+    isDeleted = isDeleted,
 )

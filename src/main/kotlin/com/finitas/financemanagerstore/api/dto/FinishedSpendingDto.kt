@@ -4,61 +4,60 @@ import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import com.finitas.financemanagerstore.domain.model.Receipt
 import com.finitas.financemanagerstore.domain.model.SpendingRecord
 import com.finitas.financemanagerstore.domain.model.SpendingSummary
-import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import org.springframework.core.io.ByteArrayResource
 import javax.sql.rowset.serial.SerialBlob
 
-data class DeleteFinishedSpendingRequest (
-    @NotBlank
+data class DeleteFinishedSpendingRequest(
+    @field:NotBlank(message = "idSpendingSummary should not be blank")
     val idSpendingSummary: String,
-    @NotBlank
+    @field:NotBlank(message = "idUser should not be blank")
     val idUser: String,
 )
 
-data class FinishedSpendingDto(
-    @Min(0)
-    val version: Int,
-    @NotBlank
-    val idUser: String,
+class FinishedSpendingDto(
     val spendingSummary: SpendingSummaryDto,
     val receipt: ReceiptDto?,
-    @Min(0)
-    val purchaseData: Int,
-    @Min(0) @Max(1)
-    val isDeleted: Int,
+    @field:Min(0, message = "purchaseDate should be a non negative integer")
+    val purchaseDate: Int,
+    @field:Min(0, message = "version should be a non negative integer")
+    val version: Int,
+    @field:NotBlank(message = "idUser should not be blank")
+    val idUser: String,
+    val isDeleted: Boolean,
 ) {
     companion object {
         fun fromEntity(entity: FinishedSpending) = FinishedSpendingDto(
-            version = entity.version,
             idUser = entity.idUser,
-            purchaseData = entity.purchaseData,
-            receipt = entity.receipt?.let { ReceiptDto.fromEntity(it) },
+            purchaseDate = entity.purchaseDate,
+            version = entity.version,
+            isDeleted = entity.isDeleted,
             spendingSummary = SpendingSummaryDto.fromEntity(entity.spendingSummary),
-            isDeleted = entity.isDeleted
+            receipt = entity.receipt?.let { ReceiptDto.fromEntity(it) }
         )
     }
 
     fun toEntity(version: Int, internalId: String) = FinishedSpending(
         version = version,
         idUser = idUser,
-        purchaseData = purchaseData,
+        purchaseDate = purchaseDate,
         isDeleted = isDeleted,
         receipt = receipt?.toEntity(),
         spendingSummary = spendingSummary.toEntity(),
-        idSpendingSummary = spendingSummary.idSpendingSummary,
         internalId = internalId,
     )
 }
 
 data class SpendingSummaryDto(
-    @NotBlank
+    @field:NotBlank(message = "idSpendingSummary should not be blank")
     val idSpendingSummary: String,
-    @Min(1)
+    @field:Min(1, message = "createdAt should be a positive integer")
     val createdAt: Int,
-    @NotBlank
+    @field:NotBlank(message = "name should not be blank")
     val name: String,
+    @field:Size(min = 1, message = "spendingRecords should not be empty")
     val spendingRecords: List<SpendingRecordDto>,
 ) {
     companion object {
@@ -79,7 +78,7 @@ data class SpendingSummaryDto(
 }
 
 data class ReceiptDto(
-    @NotBlank
+    @field:NotBlank(message = "idReceipt should not be blank")
     val idReceipt: String,
     val photo: ByteArrayResource,
 ) {
@@ -99,7 +98,7 @@ data class ReceiptDto(
 }
 
 data class SpendingRecordDto(
-    @NotBlank
+    @field:NotBlank(message = "idSpendingRecord should not be blank")
     val idSpendingRecord: String,
     val spendingRecordData: SpendingRecordDataDto,
 ) {
