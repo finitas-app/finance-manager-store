@@ -8,7 +8,7 @@ import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("api/finished-spendings")
+@RequestMapping("api/store/finished-spendings")
 class FinishedSpendingController(private val service: FinishedSpendingService) {
 
     @PutMapping("synchronize")

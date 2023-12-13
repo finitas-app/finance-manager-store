@@ -8,7 +8,7 @@ import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("api/store/users")
 class UserController(private val service: UserService) {
 
     @PutMapping
@@ -33,5 +33,10 @@ class UserController(private val service: UserService) {
     fun getNicknames(@Valid @RequestBody request: GetVisibleNamesRequest, errors: Errors): List<IdUserWithVisibleName> {
         errors.validate()
         return service.getVisibleNames(request)
+    }
+
+    @GetMapping("{idUser}/regular-spendings")
+    fun getUserRegularSpendings(@PathVariable idUser: String): List<RegularSpendingDto> {
+        return service.getUserRegularSpendings(idUser)
     }
 }

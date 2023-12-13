@@ -4,6 +4,7 @@ import com.finitas.financemanagerstore.api.dto.ShoppingListDto
 import com.finitas.financemanagerstore.api.dto.SynchronizationRequest
 import com.finitas.financemanagerstore.api.dto.SynchronizationResponse
 import com.finitas.financemanagerstore.config.ConflictException
+import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.NotFoundException
 import com.finitas.financemanagerstore.domain.model.ShoppingList
 import com.finitas.financemanagerstore.domain.repositories.ShoppingListRepository
@@ -50,7 +51,7 @@ class ShoppingListService(
         try {
             repository.save(dto.toEntity(newItemVersion, UUID.randomUUID().toString()))
         } catch (_: DuplicateKeyException) {
-            throw ConflictException("Shopping list already exists")
+            throw ConflictException(ErrorCode.SHOPPING_LIST_EXISTS, "Shopping list already exists")
         }
 
         return newItemVersion
@@ -59,7 +60,7 @@ class ShoppingListService(
     @Transactional
     fun update(dto: ShoppingListDto): Int {
         val entity = repository.findByIdUserAndIdShoppingList(dto.idUser, dto.idShoppingList)
-            ?: throw NotFoundException("Shopping list not found")
+            ?: throw NotFoundException(ErrorCode.SHOPPING_LIST_NOT_FOUND, "Shopping list not found")
 
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val query = Query(
@@ -78,10 +79,10 @@ class ShoppingListService(
     @Transactional
     fun delete(idUser: String, idShoppingList: String): Int {
         val entity = repository.findByIdUserAndIdShoppingList(idUser, idShoppingList)
-            ?: throw NotFoundException("Shopping list not found")
+            ?: throw NotFoundException(ErrorCode.SHOPPING_LIST_NOT_FOUND, "Shopping list not found")
 
         if (entity.isDeleted) {
-            throw ConflictException("Already deleted")
+            throw ConflictException(ErrorCode.SHOPPING_LIST_DELETED, "Already deleted")
         }
 
         val newVersion = getMaxVersionFromDb(idUser) + 1

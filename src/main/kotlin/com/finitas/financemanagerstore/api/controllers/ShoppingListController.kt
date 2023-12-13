@@ -8,7 +8,7 @@ import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("api/shopping-lists")
+@RequestMapping("api/store/shopping-lists")
 class ShoppingListController(private val service: ShoppingListService) {
 
     @PutMapping("synchronize")

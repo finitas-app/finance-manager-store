@@ -40,6 +40,13 @@ data class RegularSpendingDto(
     val cron: String,
     val spendingSummary: SpendingSummaryDto,
 ) {
+    companion object {
+        fun fromEntity(entity: RegularSpending) = RegularSpendingDto(
+            idRegularSpending = entity.idRegularSpending,
+            cron = entity.cron,
+            spendingSummary = SpendingSummaryDto.fromEntity(entity.spendingSummary)
+        )
+    }
 
     fun toEntity() = RegularSpending(
         idRegularSpending = idRegularSpending,

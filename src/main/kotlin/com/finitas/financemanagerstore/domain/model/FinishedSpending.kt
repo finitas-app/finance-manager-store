@@ -3,16 +3,10 @@ package com.finitas.financemanagerstore.domain.model
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
-import java.sql.Blob
 
 class SpendingRecord(
     val idSpendingRecord: String,
     val spendingRecordData: SpendingRecordData,
-)
-
-class Receipt(
-    val idReceipt: String,
-    val photo: Blob
 )
 
 class SpendingSummary(
@@ -32,7 +26,7 @@ class SpendingSummary(
 )
 class FinishedSpending(
     val spendingSummary: SpendingSummary,
-    val receipt: Receipt?,
+    val idReceipt: String?,
     val purchaseDate: Int,
     internalId: String,
     version: Int,

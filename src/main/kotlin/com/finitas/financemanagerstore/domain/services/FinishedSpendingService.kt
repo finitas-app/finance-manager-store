@@ -4,6 +4,7 @@ import com.finitas.financemanagerstore.api.dto.FinishedSpendingDto
 import com.finitas.financemanagerstore.api.dto.SynchronizationRequest
 import com.finitas.financemanagerstore.api.dto.SynchronizationResponse
 import com.finitas.financemanagerstore.config.ConflictException
+import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.NotFoundException
 import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import com.finitas.financemanagerstore.domain.repositories.FinishedSpendingRepository
@@ -50,7 +51,7 @@ class FinishedSpendingService(
         try {
             repository.save(dto.toEntity(newItemVersion, UUID.randomUUID().toString()))
         } catch (_: DuplicateKeyException) {
-            throw ConflictException("Finished spending already exists")
+            throw ConflictException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending already exists")
         }
 
         return newItemVersion
@@ -62,7 +63,7 @@ class FinishedSpendingService(
             dto.idUser,
             dto.spendingSummary.idSpendingSummary
         )
-            ?: throw NotFoundException("Finished spending not found")
+            ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_EXISTS, "Finished spending not found")
 
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val query = Query(
@@ -71,6 +72,7 @@ class FinishedSpendingService(
         val update = Update()
             .set("version", newItemVersion)
             .set("isDeleted", dto.isDeleted)
+            .set("idReceipt", dto.idReceipt)
             .set("spendingSummary", dto.spendingSummary)
             .set("purchaseDate", dto.purchaseDate)
 
@@ -82,10 +84,10 @@ class FinishedSpendingService(
     @Transactional
     fun delete(idUser: String, idSpendingSummary: String): Int {
         val entity = repository.findByIdUserAndSpendingSummaryIdSpendingSummary(idUser, idSpendingSummary)
-            ?: throw NotFoundException("Finished spending not found")
+            ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending not found")
 
         if (entity.isDeleted) {
-            throw ConflictException("Already deleted")
+            throw ConflictException(ErrorCode.FINISHED_SPENDING_DELETED, "Already deleted")
         }
 
         val newVersion = getMaxVersionFromDb(idUser) + 1

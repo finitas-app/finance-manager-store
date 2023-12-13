@@ -1,5 +1,6 @@
 package com.finitas.financemanagerstore.api.dto
 
+import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.domain.model.Category
 import com.finitas.financemanagerstore.domain.model.SpendingRecordData
 import jakarta.validation.constraints.Min
@@ -8,6 +9,12 @@ import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 
 data class ResponseMessage(val message: String)
+
+data class ErrorResponse(
+    val errorCode: ErrorCode,
+    val errorMessage: String? = null,
+)
+
 data class UpdateResponse(val lastSyncVersion: Int)
 
 data class SynchronizationRequest<T>(

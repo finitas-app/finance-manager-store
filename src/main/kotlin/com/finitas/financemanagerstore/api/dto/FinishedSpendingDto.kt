@@ -1,14 +1,11 @@
 package com.finitas.financemanagerstore.api.dto
 
 import com.finitas.financemanagerstore.domain.model.FinishedSpending
-import com.finitas.financemanagerstore.domain.model.Receipt
 import com.finitas.financemanagerstore.domain.model.SpendingRecord
 import com.finitas.financemanagerstore.domain.model.SpendingSummary
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import org.springframework.core.io.ByteArrayResource
-import javax.sql.rowset.serial.SerialBlob
 
 data class DeleteFinishedSpendingRequest(
     @field:NotBlank(message = "idSpendingSummary should not be blank")
@@ -19,7 +16,7 @@ data class DeleteFinishedSpendingRequest(
 
 class FinishedSpendingDto(
     val spendingSummary: SpendingSummaryDto,
-    val receipt: ReceiptDto?,
+    val idReceipt: String?,
     @field:Min(0, message = "purchaseDate should be a non negative integer")
     val purchaseDate: Int,
     @field:Min(0, message = "version should be a non negative integer")
@@ -35,7 +32,7 @@ class FinishedSpendingDto(
             version = entity.version,
             isDeleted = entity.isDeleted,
             spendingSummary = SpendingSummaryDto.fromEntity(entity.spendingSummary),
-            receipt = entity.receipt?.let { ReceiptDto.fromEntity(it) }
+            idReceipt = entity.idReceipt
         )
     }
 
@@ -44,7 +41,7 @@ class FinishedSpendingDto(
         idUser = idUser,
         purchaseDate = purchaseDate,
         isDeleted = isDeleted,
-        receipt = receipt?.toEntity(),
+        idReceipt = idReceipt,
         spendingSummary = spendingSummary.toEntity(),
         internalId = internalId,
     )
@@ -74,26 +71,6 @@ data class SpendingSummaryDto(
         name = name,
         spendingRecords = spendingRecords.map { it.toEntity() },
         idSpendingSummary = idSpendingSummary
-    )
-}
-
-data class ReceiptDto(
-    @field:NotBlank(message = "idReceipt should not be blank")
-    val idReceipt: String,
-    val photo: ByteArrayResource,
-) {
-    companion object {
-        fun fromEntity(entity: Receipt) = ReceiptDto(
-            idReceipt = entity.idReceipt,
-            photo = entity.photo
-                .getBytes(1, entity.photo.length().toInt())
-                .let { ByteArrayResource(it) }
-        )
-    }
-
-    fun toEntity() = Receipt(
-        idReceipt = idReceipt,
-        photo = SerialBlob(photo.byteArray),
     )
 }
 
