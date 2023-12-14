@@ -81,10 +81,6 @@ class ShoppingListService(
         val entity = repository.findByIdUserAndIdShoppingList(idUser, idShoppingList)
             ?: throw NotFoundException(ErrorCode.SHOPPING_LIST_NOT_FOUND, "Shopping list not found")
 
-        if (entity.isDeleted) {
-            throw ConflictException(ErrorCode.SHOPPING_LIST_DELETED, "Already deleted")
-        }
-
         val newVersion = getMaxVersionFromDb(idUser) + 1
         val query = Query(
             Criteria.where("internalId").`is`(entity.internalId)

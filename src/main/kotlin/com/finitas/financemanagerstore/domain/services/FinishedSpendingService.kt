@@ -86,10 +86,6 @@ class FinishedSpendingService(
         val entity = repository.findByIdUserAndSpendingSummaryIdSpendingSummary(idUser, idSpendingSummary)
             ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending not found")
 
-        if (entity.isDeleted) {
-            throw ConflictException(ErrorCode.FINISHED_SPENDING_DELETED, "Already deleted")
-        }
-
         val newVersion = getMaxVersionFromDb(idUser) + 1
         val query = Query(
             Criteria.where("internalId").`is`(entity.internalId)
