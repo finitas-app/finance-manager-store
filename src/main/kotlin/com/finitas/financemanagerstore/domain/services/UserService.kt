@@ -42,7 +42,8 @@ class UserService(private val repository: UserRepository) {
     }
 
     fun getVisibleNames(request: GetVisibleNamesRequest) =
-        repository.findAllById(request.userIds).map { IdUserWithVisibleName(it.idUser, it.visibleName) }
+        repository.findAllById(request.userIds.map { it.userId })
+            .map { IdUserWithVisibleName(it.idUser, it.visibleName) }
 
     fun getUserRegularSpendings(idUser: String) =
         repository
