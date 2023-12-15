@@ -4,10 +4,13 @@ import com.finitas.financemanagerstore.domain.model.RegularSpending
 import com.finitas.financemanagerstore.domain.model.User
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+data class UserIdValue(
+    val userId: String,
+)
 
 data class GetVisibleNamesRequest(
     @field:Size(min = 1, message = "userIds should not be empty")
-    val userIds: List<String>
+    val userIds: List<UserIdValue>
 )
 
 data class IdUserWithVisibleName(
