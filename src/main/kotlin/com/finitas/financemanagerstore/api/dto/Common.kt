@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
+import java.util.UUID
 
 data class ResponseMessage(val message: String)
 
@@ -31,8 +32,7 @@ data class SynchronizationResponse<T>(
 )
 
 data class SpendingRecordDataDto(
-    @field:NotBlank(message = "idSpendingRecordData should not be blank")
-    val idSpendingRecordData: String,
+    val idSpendingRecordData: UUID,
     @field:NotBlank(message = "name should not be blank")
     val name: String,
     @field:Min(0, message = "price should be a non negative integer")
@@ -57,12 +57,10 @@ data class SpendingRecordDataDto(
 }
 
 data class CategoryDto(
-    @field:NotBlank(message = "idCategory should not be blank")
-    val idCategory: String,
+    val idCategory: UUID,
     @field:NotBlank(message = "name should not be blank")
     val name: String,
-    @field:NotBlank(message = "idParent should not be blank")
-    val idParent: String?,
+    val idParent: UUID?,
 ) {
     companion object {
         fun fromEntity(entity: Category) = CategoryDto(

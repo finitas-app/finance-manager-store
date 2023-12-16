@@ -4,17 +4,18 @@ import com.finitas.financemanagerstore.domain.model.ShoppingList
 import org.springframework.data.domain.Limit
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.repository.MongoRepository
+import java.util.*
 
 
-interface ShoppingListRepository : MongoRepository<ShoppingList, String> {
+interface ShoppingListRepository : MongoRepository<ShoppingList, UUID> {
 
-    fun findAllByIdUserAndVersionGreaterThan(idUser: String, version: Int): List<ShoppingList>
+    fun findAllByIdUserAndVersionGreaterThan(idUser: UUID, version: Int): List<ShoppingList>
 
-    fun findByIdUser(idUser: String, sort: Sort, limit: Limit): List<ShoppingList>
+    fun findByIdUser(idUser: UUID, sort: Sort, limit: Limit): List<ShoppingList>
 
-    fun findByIdUserAndIdShoppingList(idUser: String, idShoppingList: String): ShoppingList?
+    fun findByIdUserAndIdShoppingList(idUser: UUID, idShoppingList: UUID): ShoppingList?
 
-    fun existsByIdUserAndIdShoppingList(idUser: String, idShoppingList: String): Boolean
+    fun existsByIdUserAndIdShoppingList(idUser: UUID, idShoppingList: UUID): Boolean
 
-    fun findAllByIdUser(idUser: String): List<ShoppingList>
+    fun findAllByIdUser(idUser: UUID): List<ShoppingList>
 }

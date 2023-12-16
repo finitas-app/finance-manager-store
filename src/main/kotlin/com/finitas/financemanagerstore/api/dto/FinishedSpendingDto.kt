@@ -6,23 +6,21 @@ import com.finitas.financemanagerstore.domain.model.SpendingSummary
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import java.util.*
 
 data class DeleteFinishedSpendingRequest(
-    @field:NotBlank(message = "idSpendingSummary should not be blank")
-    val idSpendingSummary: String,
-    @field:NotBlank(message = "idUser should not be blank")
-    val idUser: String,
+    val idSpendingSummary: UUID,
+    val idUser: UUID,
 )
 
 class FinishedSpendingDto(
     val spendingSummary: SpendingSummaryDto,
-    val idReceipt: String?,
+    val idReceipt: UUID?,
     @field:Min(0, message = "purchaseDate should be a non negative integer")
     val purchaseDate: Int,
     @field:Min(0, message = "version should be a non negative integer")
     val version: Int,
-    @field:NotBlank(message = "idUser should not be blank")
-    val idUser: String,
+    val idUser: UUID,
     val isDeleted: Boolean,
 ) {
     companion object {
@@ -36,7 +34,7 @@ class FinishedSpendingDto(
         )
     }
 
-    fun toEntity(version: Int, internalId: String) = FinishedSpending(
+    fun toEntity(version: Int, internalId: UUID) = FinishedSpending(
         version = version,
         idUser = idUser,
         purchaseDate = purchaseDate,
@@ -48,8 +46,7 @@ class FinishedSpendingDto(
 }
 
 data class SpendingSummaryDto(
-    @field:NotBlank(message = "idSpendingSummary should not be blank")
-    val idSpendingSummary: String,
+    val idSpendingSummary: UUID,
     @field:Min(1, message = "createdAt should be a positive integer")
     val createdAt: Int,
     @field:NotBlank(message = "name should not be blank")
@@ -75,8 +72,7 @@ data class SpendingSummaryDto(
 }
 
 data class SpendingRecordDto(
-    @field:NotBlank(message = "idSpendingRecord should not be blank")
-    val idSpendingRecord: String,
+    val idSpendingRecord: UUID,
     val spendingRecordData: SpendingRecordDataDto,
 ) {
     companion object {

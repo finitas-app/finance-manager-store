@@ -2,17 +2,18 @@ package com.finitas.financemanagerstore.domain.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.util.*
 
 @Document("users")
 class User(
-    @Id val internalId: String,
-    val idUser: String,
+    @Id val internalId: UUID,
+    val idUser: UUID,
     val visibleName: String,
     val regularSpendings: List<RegularSpending>
 )
 
 class RegularSpending(
-    val idRegularSpending: String,
+    val idRegularSpending: UUID,
     val cron: String,
     val spendingSummary: SpendingSummary,
 )

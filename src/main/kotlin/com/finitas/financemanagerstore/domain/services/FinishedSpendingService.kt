@@ -32,7 +32,7 @@ class FinishedSpendingService(
     ) =
         !dto.isDeleted && entity.isDeleted
 
-    private fun getMaxVersionFromDb(userId: String): Int {
+    private fun getMaxVersionFromDb(userId: UUID): Int {
         return repository.findByIdUser(
             userId,
             Sort.by(Sort.Direction.DESC, "version"),
@@ -40,7 +40,7 @@ class FinishedSpendingService(
         ).firstOrNull()?.version ?: 0
     }
 
-    fun getAll(idUser: String): List<FinishedSpendingDto> {
+    fun getAll(idUser: UUID): List<FinishedSpendingDto> {
         return repository.findAllByIdUser(idUser)
             .map { FinishedSpendingDto.fromEntity(it) }
     }
@@ -49,7 +49,7 @@ class FinishedSpendingService(
     fun insert(dto: FinishedSpendingDto): Int {
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         try {
-            repository.save(dto.toEntity(newItemVersion, UUID.randomUUID().toString()))
+            repository.save(dto.toEntity(newItemVersion, UUID.randomUUID()))
         } catch (_: DuplicateKeyException) {
             throw ConflictException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending already exists")
         }
@@ -82,7 +82,7 @@ class FinishedSpendingService(
     }
 
     @Transactional
-    fun delete(idUser: String, idSpendingSummary: String): Int {
+    fun delete(idUser: UUID, idSpendingSummary: UUID): Int {
         val entity = repository.findByIdUserAndSpendingSummaryIdSpendingSummary(idUser, idSpendingSummary)
             ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending not found")
 

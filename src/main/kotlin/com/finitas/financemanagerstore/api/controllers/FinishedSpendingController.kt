@@ -6,6 +6,7 @@ import com.finitas.financemanagerstore.domain.services.FinishedSpendingService
 import jakarta.validation.Valid
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("api/store/finished-spendings")
@@ -21,7 +22,7 @@ class FinishedSpendingController(private val service: FinishedSpendingService) {
     }
 
     @GetMapping("{idUser}")
-    fun getUserFinishedSpendings(@PathVariable idUser: String): List<FinishedSpendingDto> {
+    fun getUserFinishedSpendings(@PathVariable idUser: UUID): List<FinishedSpendingDto> {
         return service.getAll(idUser)
     }
 

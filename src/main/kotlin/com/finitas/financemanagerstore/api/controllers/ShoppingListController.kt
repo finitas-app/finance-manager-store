@@ -6,6 +6,7 @@ import com.finitas.financemanagerstore.domain.services.ShoppingListService
 import jakarta.validation.Valid
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("api/store/shopping-lists")
@@ -21,7 +22,7 @@ class ShoppingListController(private val service: ShoppingListService) {
     }
 
     @GetMapping("{idUser}")
-    fun getUserShoppingLists(@PathVariable idUser: String): List<ShoppingListDto> {
+    fun getUserShoppingLists(@PathVariable idUser: UUID): List<ShoppingListDto> {
         return service.getAll(idUser)
     }
 
