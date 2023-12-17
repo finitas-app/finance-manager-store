@@ -6,5 +6,5 @@ fun Errors.validate() {
     if (!this.hasErrors()) return
 
     val message = allErrors.map { it.defaultMessage }.joinToString(", ")
-    throw BadRequestException(errorCode = ErrorCode.STORE_REQUEST_INPUT_INVALID, message = message)
+    throw BadRequestException(errorCode = ErrorCode.STORE_REQUEST_INPUT_VALIDATION_FAILED, message = message)
 }
