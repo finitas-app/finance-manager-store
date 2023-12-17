@@ -4,8 +4,10 @@ import com.finitas.financemanagerstore.domain.model.RegularSpending
 import com.finitas.financemanagerstore.domain.model.User
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import java.util.*
+
 data class UserIdValue(
-    val userId: String,
+    val userId: UUID,
 )
 
 data class GetVisibleNamesRequest(
@@ -14,15 +16,13 @@ data class GetVisibleNamesRequest(
 )
 
 data class IdUserWithVisibleName(
-    @field:NotBlank(message = "idUser should not be blank")
-    val idUser: String,
+    val idUser: UUID,
     @field:NotBlank(message = "visibleName should not be blank")
     val visibleName: String,
 )
 
 data class UserDto(
-    @field:NotBlank(message = "idUser should not be blank")
-    val idUser: String,
+    val idUser: UUID,
     @field:NotBlank(message = "visibleName should not be blank")
     val visibleName: String,
     val regularSpendings: List<RegularSpendingDto>
@@ -37,8 +37,7 @@ data class UserDto(
 }
 
 data class RegularSpendingDto(
-    @field:NotBlank(message = "idRegularSpending should not be blank")
-    val idRegularSpending: String,
+    val idRegularSpending: UUID,
     @field:NotBlank(message = "cron should not be blank")
     val cron: String,
     val spendingSummary: SpendingSummaryDto,

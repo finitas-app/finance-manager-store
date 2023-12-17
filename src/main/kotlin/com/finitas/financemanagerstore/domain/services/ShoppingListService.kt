@@ -32,7 +32,7 @@ class ShoppingListService(
     ) =
         !dto.isDeleted && entity.isDeleted
 
-    private fun getMaxVersionFromDb(userId: String): Int {
+    private fun getMaxVersionFromDb(userId: UUID): Int {
         return repository.findByIdUser(
             userId,
             Sort.by(Sort.Direction.DESC, "version"),
@@ -40,7 +40,7 @@ class ShoppingListService(
         ).firstOrNull()?.version ?: 0
     }
 
-    fun getAll(idUser: String): List<ShoppingListDto> {
+    fun getAll(idUser: UUID): List<ShoppingListDto> {
         return repository.findAllByIdUser(idUser)
             .map { ShoppingListDto.fromEntity(it) }
     }
@@ -49,7 +49,7 @@ class ShoppingListService(
     fun insert(dto: ShoppingListDto): Int {
         val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         try {
-            repository.save(dto.toEntity(newItemVersion, UUID.randomUUID().toString()))
+            repository.save(dto.toEntity(newItemVersion, UUID.randomUUID()))
         } catch (_: DuplicateKeyException) {
             throw ConflictException(ErrorCode.SHOPPING_LIST_EXISTS, "Shopping list already exists")
         }
@@ -77,7 +77,7 @@ class ShoppingListService(
     }
 
     @Transactional
-    fun delete(idUser: String, idShoppingList: String): Int {
+    fun delete(idUser: UUID, idShoppingList: UUID): Int {
         val entity = repository.findByIdUserAndIdShoppingList(idUser, idShoppingList)
             ?: throw NotFoundException(ErrorCode.SHOPPING_LIST_NOT_FOUND, "Shopping list not found")
 

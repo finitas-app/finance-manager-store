@@ -10,6 +10,7 @@ import com.finitas.financemanagerstore.domain.model.User
 import com.finitas.financemanagerstore.domain.repositories.UserRepository
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Component
@@ -21,7 +22,7 @@ class UserService(private val repository: UserRepository) {
     }
 
     @Transactional
-    fun addNewRegularSpendings(idUser: String, newSpendings: List<RegularSpendingDto>) {
+    fun addNewRegularSpendings(idUser: UUID, newSpendings: List<RegularSpendingDto>) {
         val userFromRepo = repository
             .findById(idUser)
             .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
@@ -45,9 +46,15 @@ class UserService(private val repository: UserRepository) {
         repository.findAllById(request.userIds.map { it.userId })
             .map { IdUserWithVisibleName(it.idUser, it.visibleName) }
 
-    fun getUserRegularSpendings(idUser: String) =
+    fun getUserRegularSpendings(idUser: UUID) =
         repository
             .findById(idUser)
+            .apply {
+                println("******************")
+                println(idUser)
+                println("******************")
+                println(idUser.toString())
+            }
             .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
             .regularSpendings
             .map { RegularSpendingDto.fromEntity(it) }

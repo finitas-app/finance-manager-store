@@ -6,6 +6,7 @@ import com.finitas.financemanagerstore.domain.services.UserService
 import jakarta.validation.Valid
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("api/store/users")
@@ -20,7 +21,7 @@ class UserController(private val service: UserService) {
 
     @PostMapping("{idUser}/regular-spendings")
     fun addRegularSpendings(
-        @PathVariable idUser: String,
+        @PathVariable idUser: UUID,
         @Valid @RequestBody regularSpendings: List<RegularSpendingDto>,
         errors: Errors
     ): ResponseMessage {
@@ -36,7 +37,7 @@ class UserController(private val service: UserService) {
     }
 
     @GetMapping("{idUser}/regular-spendings")
-    fun getUserRegularSpendings(@PathVariable idUser: String): List<RegularSpendingDto> {
+    fun getUserRegularSpendings(@PathVariable idUser: UUID): List<RegularSpendingDto> {
         return service.getUserRegularSpendings(idUser)
     }
 }

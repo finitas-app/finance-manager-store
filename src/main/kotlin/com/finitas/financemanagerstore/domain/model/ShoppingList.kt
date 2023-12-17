@@ -3,10 +3,11 @@ package com.finitas.financemanagerstore.domain.model
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
+import java.util.*
 
 class ShoppingItem(
     val isDone: Int,
-    val idShoppingItem: String,
+    val idShoppingItem: UUID,
     val spendingRecordData: SpendingRecordData,
 )
 
@@ -15,11 +16,11 @@ class ShoppingItem(
     CompoundIndex(name = "idUserWithIdShoppingList", def = "{'idShoppingList' : 1, 'idUser' : 1}", unique = true)
 )
 class ShoppingList(
-    val idShoppingList: String,
+    val idShoppingList: UUID,
     val shoppingItems: List<ShoppingItem>,
-    internalId: String,
+    internalId: UUID,
     version: Int,
-    idUser: String,
+    idUser: UUID,
     isDeleted: Boolean,
 ) : AbstractSpending(
     internalId = internalId,
