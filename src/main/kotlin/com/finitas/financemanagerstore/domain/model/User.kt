@@ -8,8 +8,8 @@ import java.util.*
 class User(
     @Id val internalId: UUID,
     val idUser: UUID,
-    val visibleName: String,
-    val regularSpendings: List<RegularSpending>
+    var visibleName: String,
+    var regularSpendings: List<RegularSpending>
 )
 
 class RegularSpending(

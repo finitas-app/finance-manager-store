@@ -4,6 +4,7 @@ import com.finitas.financemanagerstore.api.dto.*
 import com.finitas.financemanagerstore.config.validate
 import com.finitas.financemanagerstore.domain.services.UserService
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -36,8 +37,24 @@ class UserController(private val service: UserService) {
         return service.getVisibleNames(request)
     }
 
+    @PatchMapping("nicknames")
+    fun updateNickname(@Valid @RequestBody request: IdUserWithVisibleName, errors: Errors): ResponseEntity<Unit> {
+        errors.validate()
+        service.updateVisibleName(request)
+        return ResponseEntity.noContent().build()
+    }
+
     @GetMapping("{idUser}/regular-spendings")
     fun getUserRegularSpendings(@PathVariable idUser: UUID): List<RegularSpendingDto> {
         return service.getUserRegularSpendings(idUser)
+    }
+
+    @DeleteMapping("{idUser}/regular-spendings/{idRegularSpending}")
+    fun deleteUserRegularSpendings(
+        @PathVariable idUser: UUID,
+        @PathVariable idRegularSpending: UUID
+    ): ResponseEntity<Unit> {
+        service.deleteUserRegularSpending(idUser = idUser, idRegularSpending = idRegularSpending)
+        return ResponseEntity.noContent().build()
     }
 }

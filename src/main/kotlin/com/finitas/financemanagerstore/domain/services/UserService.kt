@@ -37,7 +37,7 @@ class UserService(private val repository: UserRepository) {
                 idUser = idUser,
                 visibleName = userFromRepo.visibleName,
                 internalId = userFromRepo.internalId,
-                regularSpendings = spendingGroupedById.values.toList()
+                regularSpendings = spendingGroupedById.values.toMutableList()
             )
         )
     }
@@ -46,16 +46,24 @@ class UserService(private val repository: UserRepository) {
         repository.findAllById(request.userIds.map { it.userId })
             .map { IdUserWithVisibleName(it.idUser, it.visibleName) }
 
+    fun updateVisibleName(request: IdUserWithVisibleName) {
+        repository.findById(request.idUser)
+            .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
+            .apply { visibleName = request.visibleName }
+            .also { repository.save(it) }
+    }
+
     fun getUserRegularSpendings(idUser: UUID) =
         repository
             .findById(idUser)
-            .apply {
-                println("******************")
-                println(idUser)
-                println("******************")
-                println(idUser.toString())
-            }
             .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
             .regularSpendings
             .map { RegularSpendingDto.fromEntity(it) }
+
+    fun deleteUserRegularSpending(idUser: UUID, idRegularSpending: UUID) {
+        repository.findById(idUser)
+            .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
+            .apply { regularSpendings = regularSpendings.filter { it.idRegularSpending != idRegularSpending } }
+            .also { repository.save(it) }
+    }
 }
