@@ -2,6 +2,7 @@ package com.finitas.financemanagerstore.domain.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDateTime
 import java.util.*
 
 @Document("users")
@@ -13,7 +14,8 @@ class User(
 )
 
 class RegularSpending(
-    val idRegularSpending: UUID,
-    val cron: String,
+    val actualizationPeriod: Int,
+    val periodUnit: Int,
+    val lastActualizationDate: LocalDateTime,
     val spendingSummary: SpendingSummary,
 )

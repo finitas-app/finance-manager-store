@@ -27,9 +27,10 @@ class UserService(private val repository: UserRepository) {
             .findById(idUser)
             .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
 
-        val spendingGroupedById = userFromRepo.regularSpendings.associateBy { it.idRegularSpending }.toMutableMap()
+        val spendingGroupedById =
+            userFromRepo.regularSpendings.associateBy { it.spendingSummary.idSpendingSummary }.toMutableMap()
         newSpendings.forEach {
-            spendingGroupedById[it.idRegularSpending] = it.toEntity()
+            spendingGroupedById[it.spendingSummary.idSpendingSummary] = it.toEntity()
         }
 
         repository.save(
@@ -60,10 +61,12 @@ class UserService(private val repository: UserRepository) {
             .regularSpendings
             .map { RegularSpendingDto.fromEntity(it) }
 
-    fun deleteUserRegularSpending(idUser: UUID, idRegularSpending: UUID) {
+    fun deleteUserRegularSpending(idUser: UUID, idSpendingSummary: UUID) {
         repository.findById(idUser)
             .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
-            .apply { regularSpendings = regularSpendings.filter { it.idRegularSpending != idRegularSpending } }
+            .apply {
+                regularSpendings = regularSpendings.filter { it.spendingSummary.idSpendingSummary != idSpendingSummary }
+            }
             .also { repository.save(it) }
     }
 }
