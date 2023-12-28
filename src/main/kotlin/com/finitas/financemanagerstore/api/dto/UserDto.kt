@@ -4,6 +4,7 @@ import com.finitas.financemanagerstore.domain.model.RegularSpending
 import com.finitas.financemanagerstore.domain.model.User
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import java.time.LocalDateTime
 import java.util.*
 
 data class UserIdValue(
@@ -37,22 +38,24 @@ data class UserDto(
 }
 
 data class RegularSpendingDto(
-    val idRegularSpending: UUID,
-    @field:NotBlank(message = "cron should not be blank")
-    val cron: String,
+    val actualizationPeriod: Int,
+    val periodUnit: Int,
+    val lastActualizationDate: LocalDateTime,
     val spendingSummary: SpendingSummaryDto,
 ) {
     companion object {
         fun fromEntity(entity: RegularSpending) = RegularSpendingDto(
-            idRegularSpending = entity.idRegularSpending,
-            cron = entity.cron,
+            actualizationPeriod = entity.actualizationPeriod,
+            periodUnit = entity.periodUnit,
+            lastActualizationDate = entity.lastActualizationDate,
             spendingSummary = SpendingSummaryDto.fromEntity(entity.spendingSummary)
         )
     }
 
     fun toEntity() = RegularSpending(
-        idRegularSpending = idRegularSpending,
-        cron = cron,
+        actualizationPeriod = actualizationPeriod,
+        periodUnit = periodUnit,
+        lastActualizationDate = lastActualizationDate,
         spendingSummary = spendingSummary.toEntity()
     )
 }

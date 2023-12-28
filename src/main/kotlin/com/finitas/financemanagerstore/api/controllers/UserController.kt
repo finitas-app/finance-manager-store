@@ -49,12 +49,12 @@ class UserController(private val service: UserService) {
         return service.getUserRegularSpendings(idUser)
     }
 
-    @DeleteMapping("{idUser}/regular-spendings/{idRegularSpending}")
+    @DeleteMapping("{idUser}/regular-spendings/{idSpendingSummary}")
     fun deleteUserRegularSpendings(
         @PathVariable idUser: UUID,
-        @PathVariable idRegularSpending: UUID
+        @PathVariable idSpendingSummary: UUID
     ): ResponseEntity<Unit> {
-        service.deleteUserRegularSpending(idUser = idUser, idRegularSpending = idRegularSpending)
+        service.deleteUserRegularSpending(idUser = idUser, idSpendingSummary = idSpendingSummary)
         return ResponseEntity.noContent().build()
     }
 }
