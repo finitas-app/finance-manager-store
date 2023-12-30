@@ -20,6 +20,8 @@ class ShoppingItem(
 class ShoppingList(
     val idShoppingList: UUID,
     val isFinished: Boolean,
+    val name: String,
+    val color: Int,
     val shoppingItems: List<ShoppingItem>,
     internalId: UUID,
     version: Int,

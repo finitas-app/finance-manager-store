@@ -6,15 +6,16 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Document("users")
-class User(
+data class User(
     @Id val internalId: UUID,
     val idUser: UUID,
+    val version: Int,
     var visibleName: String,
     var regularSpendings: List<RegularSpending>,
     var categories: List<Category>
 )
 
-class RegularSpending(
+data class RegularSpending(
     val actualizationPeriod: Int,
     val periodUnit: Int,
     val lastActualizationDate: LocalDateTime,

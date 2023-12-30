@@ -28,16 +28,18 @@ data class UserDto(
     val idUser: UUID,
     @field:NotBlank(message = "visibleName should not be blank")
     val visibleName: String,
+    val version: Int,
     val regularSpendings: List<RegularSpendingDto>,
     val categories: List<CategoryDto>
 ) {
 
-    fun toEntity() = User(
+    fun toEntity(version: Int) = User(
         internalId = idUser,
         idUser = idUser,
         visibleName = visibleName,
         regularSpendings = regularSpendings.map { it.toEntity() },
-        categories = categories.map { it.toEntity() }
+        categories = categories.map { it.toEntity() },
+        version = version
     )
 }
 

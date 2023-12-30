@@ -21,6 +21,8 @@ class ShoppingListDto(
     val idUser: UUID,
     val isDeleted: Boolean,
     val isFinished: Boolean,
+    val name: String,
+    val color: Int,
 ) {
     companion object {
         fun fromEntity(entity: ShoppingList) = ShoppingListDto(
@@ -29,6 +31,8 @@ class ShoppingListDto(
             isDeleted = entity.isDeleted,
             version = entity.version,
             isFinished = entity.isFinished,
+            name = entity.name,
+            color = entity.color,
             shoppingItems = entity.shoppingItems.map { ShoppingItemDto.fromEntity(it) }
         )
     }
@@ -40,6 +44,8 @@ class ShoppingListDto(
         idUser = idUser,
         isDeleted = isDeleted,
         isFinished = isFinished,
+        name = name,
+        color = color,
         shoppingItems = shoppingItems.map { it.toEntity() }
     )
 }

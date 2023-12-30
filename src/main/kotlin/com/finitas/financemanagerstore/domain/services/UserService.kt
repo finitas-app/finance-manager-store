@@ -18,7 +18,7 @@ class UserService(private val repository: UserRepository) {
 
     @Transactional
     fun upsertUser(dto: UserDto) {
-        repository.save(dto.toEntity())
+        repository.save(dto.toEntity(dto.version + 1))
     }
 
     @Transactional
@@ -39,7 +39,9 @@ class UserService(private val repository: UserRepository) {
                 visibleName = userFromRepo.visibleName,
                 internalId = userFromRepo.internalId,
                 regularSpendings = spendingGroupedById.values.toMutableList(),
-                categories = userFromRepo.categories
+                categories = userFromRepo.categories,
+                // todo: check if increment is needed
+                version = userFromRepo.version
             )
         )
     }
@@ -52,7 +54,9 @@ class UserService(private val repository: UserRepository) {
         repository.findById(request.idUser)
             .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND, "User not found") }
             .apply { visibleName = request.visibleName }
-            .also { repository.save(it) }
+            .also {
+                repository.save(it.copy(version = it.version + 1))
+            }
     }
 
     fun getUserRegularSpendings(idUser: UUID) =
