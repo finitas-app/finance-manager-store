@@ -1,9 +1,6 @@
 package com.finitas.financemanagerstore.domain.services
 
-import com.finitas.financemanagerstore.api.dto.GetVisibleNamesRequest
-import com.finitas.financemanagerstore.api.dto.IdUserWithVisibleName
-import com.finitas.financemanagerstore.api.dto.RegularSpendingDto
-import com.finitas.financemanagerstore.api.dto.UserDto
+import com.finitas.financemanagerstore.api.dto.*
 import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.NotFoundException
 import com.finitas.financemanagerstore.domain.model.User
@@ -73,5 +70,17 @@ class UserService(private val repository: UserRepository) {
                 regularSpendings = regularSpendings.filter { it.idSpendingSummary != idSpendingSummary }
             }
             .also { repository.save(it) }
+    }
+
+    fun getUser(idUser: UUID) =
+        repository.findById(idUser)
+            .getOrElse { throw NotFoundException(ErrorCode.USER_NOT_FOUND) }
+            .let { UserDto.fromEntity(it) }
+
+    fun getUsers(userIds: List<IdUserWithVersion>): List<UserDto> {
+        val groupedById = userIds.associateBy { it.userId }
+        return repository.findAllById(groupedById.keys)
+            .filter { it.version <= groupedById[it.idUser]!!.version }
+            .map { UserDto.fromEntity(it, false) }
     }
 }

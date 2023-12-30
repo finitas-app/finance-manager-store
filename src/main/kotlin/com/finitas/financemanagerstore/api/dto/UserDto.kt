@@ -18,6 +18,11 @@ data class GetVisibleNamesRequest(
     val userIds: List<UserIdValue>
 )
 
+data class IdUserWithVersion(
+    val userId: UUID,
+    val version: Int
+)
+
 data class IdUserWithVisibleName(
     val idUser: UUID,
     val visibleName: String?,
@@ -30,6 +35,18 @@ data class UserDto(
     val regularSpendings: List<RegularSpendingDto>,
     val categories: List<CategoryDto>
 ) {
+
+    companion object {
+        fun fromEntity(entity: User, withRegularSpendings: Boolean = true) = UserDto(
+            idUser = entity.idUser,
+            visibleName = entity.visibleName,
+            regularSpendings = if (withRegularSpendings)
+                entity.regularSpendings.map { RegularSpendingDto.fromEntity(it) }
+            else listOf(),
+            categories = entity.categories.map { CategoryDto.fromEntity(it) },
+            version = entity.version
+        )
+    }
 
     fun toEntity(version: Int) = User(
         internalId = idUser,
@@ -53,6 +70,14 @@ data class CategoryDto(
         name = name,
         idParent = idParent,
     )
+
+    companion object {
+        fun fromEntity(it: Category) = CategoryDto(
+            idCategory = it.idCategory,
+            name = it.name,
+            idParent = it.idParent,
+        )
+    }
 }
 
 data class RegularSpendingDto(

@@ -37,6 +37,16 @@ class UserController(private val service: UserService) {
         return service.getVisibleNames(request)
     }
 
+    @GetMapping("{idUser}")
+    fun getUser(@PathVariable idUser: UUID): UserDto {
+        return service.getUser(idUser)
+    }
+
+    @GetMapping
+    fun getUser(@RequestBody userIds: List<IdUserWithVersion>): List<UserDto> {
+        return service.getUsers(userIds)
+    }
+
     @PatchMapping("nicknames")
     fun updateNickname(@Valid @RequestBody request: IdUserWithVisibleName, errors: Errors): ResponseEntity<Unit> {
         errors.validate()
