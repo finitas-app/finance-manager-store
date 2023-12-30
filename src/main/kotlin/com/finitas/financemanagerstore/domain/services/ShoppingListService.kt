@@ -95,8 +95,7 @@ class ShoppingListService(
 
     @Transactional
     fun synchronize(dto: SynchronizationRequest<ShoppingListDto>): SynchronizationResponse<ShoppingListDto> {
-        val userId = dto.objects.first().idUser
-        val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(userId, dto.lastSyncVersion)
+        val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
         val serverChangedItemsAssociatedByIds = itemsChangedAfterLastSync.associateBy { it.idShoppingList }
 
         dto.objects
@@ -118,9 +117,9 @@ class ShoppingListService(
             }
 
         return SynchronizationResponse(
-            actualizedSyncVersion = getMaxVersionFromDb(userId),
+            actualizedSyncVersion = getMaxVersionFromDb(dto.idUser),
             objects = repository
-                .findAllByIdUserAndVersionGreaterThan(userId, dto.lastSyncVersion)
+                .findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
                 .map { ShoppingListDto.fromEntity(it) }
         )
     }
