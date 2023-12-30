@@ -6,9 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 class ShoppingItem(
-    val isDone: Int,
+    val amount: Int,
     val idShoppingItem: UUID,
-    val spendingRecordData: SpendingRecordData,
+    val idSpendingRecordData: UUID,
+    val name: String,
+    val idCategory: UUID,
 )
 
 @Document("shoppingLists")
@@ -17,6 +19,7 @@ class ShoppingItem(
 )
 class ShoppingList(
     val idShoppingList: UUID,
+    val isFinished: Boolean,
     val shoppingItems: List<ShoppingItem>,
     internalId: UUID,
     version: Int,

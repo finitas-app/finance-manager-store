@@ -10,12 +10,23 @@ class User(
     @Id val internalId: UUID,
     val idUser: UUID,
     var visibleName: String,
-    var regularSpendings: List<RegularSpending>
+    var regularSpendings: List<RegularSpending>,
+    var categories: List<Category>
 )
 
 class RegularSpending(
     val actualizationPeriod: Int,
     val periodUnit: Int,
     val lastActualizationDate: LocalDateTime,
-    val spendingSummary: SpendingSummary,
+    val idSpendingSummary: UUID,
+    val createdAt: Int,
+    val name: String,
+    val spendingRecords: List<SpendingRecord>,
 )
+
+class Category(
+    val idCategory: UUID,
+    val name: String,
+    val idParent: UUID?,
+)
+
