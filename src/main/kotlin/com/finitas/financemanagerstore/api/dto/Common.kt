@@ -3,8 +3,7 @@ package com.finitas.financemanagerstore.api.dto
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.MoneySerializer
-import com.finitas.financemanagerstore.domain.model.Category
-import com.finitas.financemanagerstore.domain.model.SpendingRecordData
+import com.finitas.financemanagerstore.domain.model.SpendingRecord
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import java.math.BigDecimal
@@ -32,48 +31,30 @@ data class SynchronizationResponse<T>(
     val objects: List<T>
 )
 
-data class SpendingRecordDataDto(
+data class SpendingRecordDto(
+    val idSpendingRecord: UUID,
     val idSpendingRecordData: UUID,
     @field:NotBlank(message = "name should not be blank")
     val name: String,
     @field:JsonSerialize(using = MoneySerializer::class)
     val price: BigDecimal,
-    val category: CategoryDto,
+    val idCategory: UUID,
 ) {
     companion object {
-        fun fromEntity(entity: SpendingRecordData) = SpendingRecordDataDto(
+        fun fromEntity(entity: SpendingRecord) = SpendingRecordDto(
+            idSpendingRecord = entity.idSpendingRecord,
             idSpendingRecordData = entity.idSpendingRecordData,
             name = entity.name,
             price = entity.price,
-            category = CategoryDto.fromEntity(entity.category)
+            idCategory = entity.idCategory,
         )
     }
 
-    fun toEntity() = SpendingRecordData(
+    fun toEntity() = SpendingRecord(
+        idSpendingRecord = idSpendingRecord,
         idSpendingRecordData = idSpendingRecordData,
         name = name,
         price = price,
-        category = category.toEntity()
-    )
-}
-
-data class CategoryDto(
-    val idCategory: UUID,
-    @field:NotBlank(message = "name should not be blank")
-    val name: String,
-    val idParent: UUID?,
-) {
-    companion object {
-        fun fromEntity(entity: Category) = CategoryDto(
-            idCategory = entity.idCategory,
-            name = entity.name,
-            idParent = entity.idParent,
-        )
-    }
-
-    fun toEntity() = Category(
         idCategory = idCategory,
-        name = name,
-        idParent = idParent,
     )
 }

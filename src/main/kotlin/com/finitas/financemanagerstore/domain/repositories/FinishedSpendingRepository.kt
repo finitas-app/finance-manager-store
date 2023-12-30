@@ -15,7 +15,7 @@ interface FinishedSpendingRepository : MongoRepository<FinishedSpending, UUID> {
 
     fun findAllByIdUser(idUser: UUID): List<FinishedSpending>
 
-    fun findByIdUserAndSpendingSummaryIdSpendingSummary(idUser: UUID, idSpendingSummary: UUID): FinishedSpending?
+    fun findByIdUserAndIdSpendingSummary(idUser: UUID, idSpendingSummary: UUID): FinishedSpending?
 
-    fun existsByIdUserAndSpendingSummaryIdSpendingSummary(idUser: UUID, idSpendingSummary: UUID): Boolean
+    fun existsByIdUserAndIdSpendingSummary(idUser: UUID, idSpendingSummary: UUID): Boolean
 }

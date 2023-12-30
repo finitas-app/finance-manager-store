@@ -1,7 +1,9 @@
 package com.finitas.financemanagerstore.api.dto
 
+import com.finitas.financemanagerstore.domain.model.Category
 import com.finitas.financemanagerstore.domain.model.RegularSpending
 import com.finitas.financemanagerstore.domain.model.User
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
@@ -26,14 +28,30 @@ data class UserDto(
     val idUser: UUID,
     @field:NotBlank(message = "visibleName should not be blank")
     val visibleName: String,
-    val regularSpendings: List<RegularSpendingDto>
+    val regularSpendings: List<RegularSpendingDto>,
+    val categories: List<CategoryDto>
 ) {
 
     fun toEntity() = User(
         internalId = idUser,
         idUser = idUser,
         visibleName = visibleName,
-        regularSpendings = regularSpendings.map { it.toEntity() }
+        regularSpendings = regularSpendings.map { it.toEntity() },
+        categories = categories.map {it.toEntity()}
+    )
+}
+
+data class CategoryDto(
+    val idCategory: UUID,
+    @field:NotBlank(message = "name should not be blank")
+    val name: String,
+    val idParent: UUID?,
+) {
+
+    fun toEntity() = Category(
+        idCategory = idCategory,
+        name = name,
+        idParent = idParent,
     )
 }
 
@@ -41,14 +59,23 @@ data class RegularSpendingDto(
     val actualizationPeriod: Int,
     val periodUnit: Int,
     val lastActualizationDate: LocalDateTime,
-    val spendingSummary: SpendingSummaryDto,
+    val idSpendingSummary: UUID,
+    @field:Min(1, message = "createdAt should be a positive integer")
+    val createdAt: Int,
+    @field:NotBlank(message = "name should not be blank")
+    val name: String,
+    @field:Size(min = 1, message = "spendingRecords should not be empty")
+    val spendingRecords: List<SpendingRecordDto>,
 ) {
     companion object {
         fun fromEntity(entity: RegularSpending) = RegularSpendingDto(
             actualizationPeriod = entity.actualizationPeriod,
             periodUnit = entity.periodUnit,
             lastActualizationDate = entity.lastActualizationDate,
-            spendingSummary = SpendingSummaryDto.fromEntity(entity.spendingSummary)
+            createdAt = entity.createdAt,
+            name = entity.name,
+            spendingRecords = entity.spendingRecords.map { SpendingRecordDto.fromEntity(it) },
+            idSpendingSummary = entity.idSpendingSummary
         )
     }
 
@@ -56,6 +83,9 @@ data class RegularSpendingDto(
         actualizationPeriod = actualizationPeriod,
         periodUnit = periodUnit,
         lastActualizationDate = lastActualizationDate,
-        spendingSummary = spendingSummary.toEntity()
+        createdAt = createdAt,
+        name = name,
+        spendingRecords = spendingRecords.map { it.toEntity() },
+        idSpendingSummary = idSpendingSummary
     )
 }

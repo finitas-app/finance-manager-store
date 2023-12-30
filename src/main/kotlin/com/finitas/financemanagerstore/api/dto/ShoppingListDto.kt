@@ -2,7 +2,6 @@ package com.finitas.financemanagerstore.api.dto
 
 import com.finitas.financemanagerstore.domain.model.ShoppingItem
 import com.finitas.financemanagerstore.domain.model.ShoppingList
-import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -21,6 +20,7 @@ class ShoppingListDto(
     val version: Int,
     val idUser: UUID,
     val isDeleted: Boolean,
+    val isFinished: Boolean,
 ) {
     companion object {
         fun fromEntity(entity: ShoppingList) = ShoppingListDto(
@@ -28,6 +28,7 @@ class ShoppingListDto(
             idUser = entity.idUser,
             isDeleted = entity.isDeleted,
             version = entity.version,
+            isFinished = entity.isFinished,
             shoppingItems = entity.shoppingItems.map { ShoppingItemDto.fromEntity(it) }
         )
     }
@@ -38,28 +39,34 @@ class ShoppingListDto(
         version = newVersion,
         idUser = idUser,
         isDeleted = isDeleted,
+        isFinished = isFinished,
         shoppingItems = shoppingItems.map { it.toEntity() }
     )
 }
 
 data class ShoppingItemDto(
     val idShoppingItem: UUID,
-    @field:Min(0, message = "isDone flag can be of value 0 or 1")
-    @field:Max(1, message = "isDone flag can be of value 0 or 1")
-    val isDone: Int,
-    val spendingRecordData: SpendingRecordDataDto,
+    val amount: Int,
+    val idSpendingRecordData: UUID,
+    @field:NotBlank(message = "name should not be blank")
+    val name: String,
+    val idCategory: UUID,
 ) {
     companion object {
         fun fromEntity(entity: ShoppingItem) = ShoppingItemDto(
-            isDone = entity.isDone,
+            amount = entity.amount,
             idShoppingItem = entity.idShoppingItem,
-            spendingRecordData = SpendingRecordDataDto.fromEntity(entity.spendingRecordData)
+            idSpendingRecordData = entity.idSpendingRecordData,
+            name = entity.name,
+            idCategory = entity.idCategory
         )
     }
 
     fun toEntity() = ShoppingItem(
-        isDone = isDone,
+        amount = amount,
         idShoppingItem = idShoppingItem,
-        spendingRecordData = spendingRecordData.toEntity()
+        idSpendingRecordData = idSpendingRecordData,
+        name = name,
+        idCategory = idCategory
     )
 }

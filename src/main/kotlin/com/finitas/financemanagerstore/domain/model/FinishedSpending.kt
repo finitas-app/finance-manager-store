@@ -3,18 +3,15 @@ package com.finitas.financemanagerstore.domain.model
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
+import java.math.BigDecimal
 import java.util.*
 
 class SpendingRecord(
     val idSpendingRecord: UUID,
-    val spendingRecordData: SpendingRecordData,
-)
-
-class SpendingSummary(
-    val idSpendingSummary: UUID,
-    val createdAt: Int,
+    val idSpendingRecordData: UUID,
     val name: String,
-    val spendingRecords: List<SpendingRecord>,
+    val price: BigDecimal,
+    val idCategory: UUID,
 )
 
 @Document("finishedSpendings")
@@ -26,13 +23,16 @@ class SpendingSummary(
     )
 )
 class FinishedSpending(
-    val spendingSummary: SpendingSummary,
-    val idReceipt: UUID?,
-    val purchaseDate: Int,
     internalId: UUID,
     version: Int,
     idUser: UUID,
     isDeleted: Boolean,
+    val idReceipt: UUID?,
+    val purchaseDate: Int,
+    val idSpendingSummary: UUID,
+    val createdAt: Int,
+    val name: String,
+    val spendingRecords: List<SpendingRecord>,
 ) : AbstractSpending(
     internalId = internalId,
     version = version,

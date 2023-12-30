@@ -58,9 +58,9 @@ class FinishedSpendingService(
 
     @Transactional
     fun update(dto: FinishedSpendingDto): Int {
-        val entity = repository.findByIdUserAndSpendingSummaryIdSpendingSummary(
+        val entity = repository.findByIdUserAndIdSpendingSummary(
             dto.idUser,
-            dto.spendingSummary.idSpendingSummary
+            dto.idSpendingSummary
         )
             ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_EXISTS, "Finished spending not found")
 
@@ -72,7 +72,7 @@ class FinishedSpendingService(
             .set("version", newItemVersion)
             .set("isDeleted", dto.isDeleted)
             .set("idReceipt", dto.idReceipt)
-            .set("spendingSummary", dto.spendingSummary)
+            .set("spendingSummary", dto)
             .set("purchaseDate", dto.purchaseDate)
 
         mongoTemplate.upsert(query, update, FinishedSpending::class.java)
@@ -82,7 +82,7 @@ class FinishedSpendingService(
 
     @Transactional
     fun delete(idUser: UUID, idSpendingSummary: UUID): Int {
-        val entity = repository.findByIdUserAndSpendingSummaryIdSpendingSummary(idUser, idSpendingSummary)
+        val entity = repository.findByIdUserAndIdSpendingSummary(idUser, idSpendingSummary)
             ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending not found")
 
         val newVersion = getMaxVersionFromDb(idUser) + 1
@@ -101,20 +101,20 @@ class FinishedSpendingService(
     fun synchronize(dto: SynchronizationRequest<FinishedSpendingDto>): SynchronizationResponse<FinishedSpendingDto> {
         val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
         val serverChangedItemsAssociatedByIds =
-            itemsChangedAfterLastSync.associateBy { it.spendingSummary.idSpendingSummary }
+            itemsChangedAfterLastSync.associateBy { it.idSpendingSummary }
 
         dto.objects
             .filter {
-                val entityFromServer = serverChangedItemsAssociatedByIds[it.spendingSummary.idSpendingSummary]
+                val entityFromServer = serverChangedItemsAssociatedByIds[it.idSpendingSummary]
                 entityFromServer == null || (dto.isAuthorDataToUpdate && isDeletedOnServerAndUpdatedOnClient(
                     it,
                     entityFromServer
                 ))
             }
             .forEach {
-                val isExists = repository.existsByIdUserAndSpendingSummaryIdSpendingSummary(
+                val isExists = repository.existsByIdUserAndIdSpendingSummary(
                     idUser = it.idUser,
-                    idSpendingSummary = it.spendingSummary.idSpendingSummary
+                    idSpendingSummary = it.idSpendingSummary
                 )
 
                 if (isExists) update(it)
