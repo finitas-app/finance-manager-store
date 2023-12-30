@@ -1,13 +1,14 @@
 package com.finitas.financemanagerstore.api.dto
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.finitas.financemanagerstore.config.ErrorCode
+import com.finitas.financemanagerstore.config.MoneySerializer
 import com.finitas.financemanagerstore.domain.model.Category
 import com.finitas.financemanagerstore.domain.model.SpendingRecordData
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Size
 import java.math.BigDecimal
-import java.util.UUID
+import java.util.*
 
 data class ResponseMessage(val message: String)
 
@@ -21,8 +22,8 @@ data class UpdateResponse(val lastSyncVersion: Int)
 data class SynchronizationRequest<T>(
     @field:Min(0, message = "lastSyncVersion should be a non negative integer")
     val lastSyncVersion: Int,
+    val idUser: UUID,
     val isAuthorDataToUpdate: Boolean,
-    @field:Size(min = 1, message = "Update data list should not be empty")
     val objects: List<T>
 )
 
@@ -35,7 +36,7 @@ data class SpendingRecordDataDto(
     val idSpendingRecordData: UUID,
     @field:NotBlank(message = "name should not be blank")
     val name: String,
-    @field:Min(0, message = "price should be a non negative integer")
+    @field:JsonSerialize(using = MoneySerializer::class)
     val price: BigDecimal,
     val category: CategoryDto,
 ) {

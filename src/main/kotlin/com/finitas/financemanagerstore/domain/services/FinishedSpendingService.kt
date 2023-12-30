@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
-
 @Component
 class FinishedSpendingService(
     private val repository: FinishedSpendingRepository,
@@ -100,8 +99,7 @@ class FinishedSpendingService(
 
     @Transactional
     fun synchronize(dto: SynchronizationRequest<FinishedSpendingDto>): SynchronizationResponse<FinishedSpendingDto> {
-        val userId = dto.objects.first().idUser
-        val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(userId, dto.lastSyncVersion)
+        val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
         val serverChangedItemsAssociatedByIds =
             itemsChangedAfterLastSync.associateBy { it.spendingSummary.idSpendingSummary }
 
@@ -124,9 +122,9 @@ class FinishedSpendingService(
             }
 
         return SynchronizationResponse(
-            actualizedSyncVersion = getMaxVersionFromDb(userId),
+            actualizedSyncVersion = getMaxVersionFromDb(dto.idUser),
             objects = repository
-                .findAllByIdUserAndVersionGreaterThan(userId, dto.lastSyncVersion)
+                .findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
                 .map { FinishedSpendingDto.fromEntity(it) }
         )
     }
