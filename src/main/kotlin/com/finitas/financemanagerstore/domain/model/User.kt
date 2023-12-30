@@ -10,7 +10,7 @@ data class User(
     @Id val internalId: UUID,
     val idUser: UUID,
     val version: Int,
-    var visibleName: String,
+    var visibleName: String?,
     var regularSpendings: List<RegularSpending>,
     var categories: List<Category>
 )

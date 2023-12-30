@@ -20,14 +20,12 @@ data class GetVisibleNamesRequest(
 
 data class IdUserWithVisibleName(
     val idUser: UUID,
-    @field:NotBlank(message = "visibleName should not be blank")
-    val visibleName: String,
+    val visibleName: String?,
 )
 
 data class UserDto(
     val idUser: UUID,
-    @field:NotBlank(message = "visibleName should not be blank")
-    val visibleName: String,
+    val visibleName: String?,
     val version: Int,
     val regularSpendings: List<RegularSpendingDto>,
     val categories: List<CategoryDto>
