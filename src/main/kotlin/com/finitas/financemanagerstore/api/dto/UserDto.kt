@@ -37,7 +37,7 @@ data class UserDto(
         idUser = idUser,
         visibleName = visibleName,
         regularSpendings = regularSpendings.map { it.toEntity() },
-        categories = categories.map {it.toEntity()}
+        categories = categories.map { it.toEntity() }
     )
 }
 
