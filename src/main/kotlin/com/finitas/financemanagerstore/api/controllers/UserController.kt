@@ -4,6 +4,7 @@ import com.finitas.financemanagerstore.api.dto.*
 import com.finitas.financemanagerstore.config.validate
 import com.finitas.financemanagerstore.domain.services.UserService
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.Errors
 import org.springframework.web.bind.annotation.*
@@ -67,4 +68,57 @@ class UserController(private val service: UserService) {
         service.deleteUserRegularSpending(idUser = idUser, idSpendingSummary = idSpendingSummary)
         return ResponseEntity.noContent().build()
     }
+
+    @PostMapping("{idUser}/categories")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun overrideCategories(
+        @PathVariable idUser: UUID,
+        // TODO: Add validation
+        @RequestBody changeSpendingCategoryDto: ChangeSpendingCategoryDto,
+    ) {
+        service.overrideCategories(idUser, changeSpendingCategoryDto)
+    }
+
+    @PostMapping("categories/sync")
+    @ResponseStatus(HttpStatus.OK)
+    fun getCategoriesFromVersion(
+        // TODO: Add validation
+        @RequestBody syncCategoriesRequest: SyncCategoriesRequest,
+    ): GetCategoriesFromVersionResponse {
+        return service.getCategoriesFromVersion(syncCategoriesRequest)
+    }
 }
+
+
+data class ChangeSpendingCategoryDto(
+    val spendingCategories: List<SpendingCategoryDto>,
+)
+
+data class SpendingCategoryDto(
+    val name: String,
+    val idParent: UUID?,
+    val idUser: UUID?,
+    val idCategory: UUID,
+    val isDeleted: Boolean,
+)
+
+data class SyncCategoriesRequest(
+    val userVersions: List<CategoryVersionDto>,
+)
+
+data class CategoryVersionDto(
+    val idUser: UUID,
+    val version: Int,
+)
+
+
+data class GetCategoriesFromVersionResponse(
+    val userCategories: List<UserWithCategoriesDto>,
+)
+
+
+data class UserWithCategoriesDto(
+    val idUser: UUID,
+    val categoryVersion: Int,
+    val categories: List<CategoryDto>,
+)

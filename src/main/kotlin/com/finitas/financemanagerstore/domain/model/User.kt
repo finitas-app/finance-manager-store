@@ -10,6 +10,7 @@ data class User(
     @Id val internalId: UUID,
     val idUser: UUID,
     val version: Int,
+    var spendingCategoryVersion: Int,
     var visibleName: String?,
     var regularSpendings: List<RegularSpending>,
     var categories: List<Category>
@@ -29,5 +30,7 @@ class Category(
     val idCategory: UUID,
     val name: String,
     val idParent: UUID?,
+    val version: Int,
+    val isDeleted: Boolean,
 )
 

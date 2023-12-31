@@ -53,8 +53,11 @@ data class UserDto(
         idUser = idUser,
         visibleName = visibleName,
         regularSpendings = regularSpendings.map { it.toEntity() },
-        categories = categories.map { it.toEntity() },
-        version = version
+
+        categories = categories.map { it.toEntity(/*TODO: use spendingCategoryVersion in whole project*/-1) },
+        version = version,
+        // TODO: use spendingCategoryVersion in whole project
+        spendingCategoryVersion = -1
     )
 }
 
@@ -63,12 +66,16 @@ data class CategoryDto(
     @field:NotBlank(message = "name should not be blank")
     val name: String,
     val idParent: UUID?,
+    val version: Int?,
+    val isDeleted: Boolean,
 ) {
 
-    fun toEntity() = Category(
+    fun toEntity(version: Int) = Category(
         idCategory = idCategory,
         name = name,
         idParent = idParent,
+        version = version,
+        isDeleted = isDeleted,
     )
 
     companion object {
@@ -76,6 +83,8 @@ data class CategoryDto(
             idCategory = it.idCategory,
             name = it.name,
             idParent = it.idParent,
+            version = it.version,
+            isDeleted = it.isDeleted,
         )
     }
 }
