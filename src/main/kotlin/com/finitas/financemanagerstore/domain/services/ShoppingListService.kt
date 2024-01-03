@@ -1,8 +1,9 @@
 package com.finitas.financemanagerstore.domain.services
 
+import com.finitas.financemanagerstore.api.dto.FetchUpdatesResponse
+import com.finitas.financemanagerstore.api.dto.IdUserWithEntities
+import com.finitas.financemanagerstore.api.dto.IdUserWithVersion
 import com.finitas.financemanagerstore.api.dto.ShoppingListDto
-import com.finitas.financemanagerstore.api.dto.SynchronizationRequest
-import com.finitas.financemanagerstore.api.dto.SynchronizationResponse
 import com.finitas.financemanagerstore.config.ConflictException
 import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.NotFoundException
@@ -15,22 +16,17 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
-
-@Component
+@Service
+@Transactional
 class ShoppingListService(
     private val repository: ShoppingListRepository,
     private val mongoTemplate: MongoTemplate
 ) {
-
-    private fun isDeletedOnServerAndUpdatedOnClient(
-        dto: ShoppingListDto,
-        entity: ShoppingList
-    ) =
-        !dto.isDeleted && entity.isDeleted
 
     private fun getMaxVersionFromDb(userId: UUID): Int {
         return repository.findByIdUser(
@@ -45,9 +41,7 @@ class ShoppingListService(
             .map { ShoppingListDto.fromEntity(it) }
     }
 
-    @Transactional
-    fun insert(dto: ShoppingListDto): Int {
-        val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
+    fun insert(dto: ShoppingListDto, newItemVersion: Int = getMaxVersionFromDb(dto.idUser) + 1): Int {
         try {
             repository.save(dto.toEntity(newItemVersion, UUID.randomUUID()))
         } catch (_: DuplicateKeyException) {
@@ -57,12 +51,10 @@ class ShoppingListService(
         return newItemVersion
     }
 
-    @Transactional
-    fun update(dto: ShoppingListDto): Int {
+    fun update(dto: ShoppingListDto, newItemVersion: Int = getMaxVersionFromDb(dto.idUser) + 1): Int {
         val entity = repository.findByIdUserAndIdShoppingList(dto.idUser, dto.idShoppingList)
             ?: throw NotFoundException(ErrorCode.SHOPPING_LIST_NOT_FOUND, "Shopping list not found")
 
-        val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val query = Query(
             Criteria.where("internalId").`is`(entity.internalId)
         )
@@ -79,7 +71,6 @@ class ShoppingListService(
         return newItemVersion
     }
 
-    @Transactional
     fun delete(idUser: UUID, idShoppingList: UUID): Int {
         val entity = repository.findByIdUserAndIdShoppingList(idUser, idShoppingList)
             ?: throw NotFoundException(ErrorCode.SHOPPING_LIST_NOT_FOUND, "Shopping list not found")
@@ -96,34 +87,36 @@ class ShoppingListService(
         return newVersion
     }
 
-    @Transactional
-    fun synchronize(dto: SynchronizationRequest<ShoppingListDto>): SynchronizationResponse<ShoppingListDto> {
-        val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
-        val serverChangedItemsAssociatedByIds = itemsChangedAfterLastSync.associateBy { it.idShoppingList }
+    fun fetchUsersUpdates(request: List<IdUserWithVersion>): List<FetchUpdatesResponse<ShoppingListDto>> {
+        return request.mapNotNull {
+            val updates = repository
+                .findAllByIdUserAndVersionGreaterThan(
+                    idUser = it.idUser,
+                    version = it.version
+                )
+                .map { entity -> ShoppingListDto.fromEntity(entity) }
 
-        dto.objects
-            .filter {
-                val entityFromServer = serverChangedItemsAssociatedByIds[it.idShoppingList]
-                entityFromServer == null || (dto.isAuthorDataToUpdate && isDeletedOnServerAndUpdatedOnClient(
-                    it,
-                    entityFromServer
-                ))
+            updates.maxOfOrNull { update -> update.version }?.let { max ->
+                FetchUpdatesResponse(
+                    updates = updates,
+                    idUser = it.idUser,
+                    actualVersion = max
+                )
             }
+        }
+    }
+
+    fun updateWithChangedItems(request: IdUserWithEntities<ShoppingListDto>) {
+        val currentMaxVersion = AtomicInteger(getMaxVersionFromDb(request.idUser))
+        request.changedValues
             .forEach {
                 val isExists = repository.existsByIdUserAndIdShoppingList(
                     idUser = it.idUser,
                     idShoppingList = it.idShoppingList
                 )
 
-                if (isExists) update(it)
-                else insert(it)
+                if (isExists) update(it, currentMaxVersion.incrementAndGet())
+                else insert(it, currentMaxVersion.incrementAndGet())
             }
-
-        return SynchronizationResponse(
-            actualizedSyncVersion = getMaxVersionFromDb(dto.idUser),
-            objects = repository
-                .findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
-                .map { ShoppingListDto.fromEntity(it) }
-        )
     }
 }

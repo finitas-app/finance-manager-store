@@ -82,7 +82,7 @@ class UserService(private val repository: UserRepository) {
             .let { UserDto.fromEntity(it) }
 
     fun getUsers(userIds: List<IdUserWithVersion>): List<UserDto> {
-        val groupedById = userIds.associateBy { it.userId }
+        val groupedById = userIds.associateBy { it.idUser }
         return repository.findAllById(groupedById.keys)
             .filter { it.version <= groupedById[it.idUser]!!.version }
             .map { UserDto.fromEntity(it, false) }

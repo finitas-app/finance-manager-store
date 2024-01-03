@@ -19,7 +19,7 @@ data class GetVisibleNamesRequest(
 )
 
 data class IdUserWithVersion(
-    val userId: UUID,
+    val idUser: UUID,
     val version: Int
 )
 
