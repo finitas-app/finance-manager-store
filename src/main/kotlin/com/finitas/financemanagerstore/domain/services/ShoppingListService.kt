@@ -68,7 +68,10 @@ class ShoppingListService(
         )
         val update = Update()
             .set("version", newItemVersion)
+            .set("name", dto.name)
+            .set("color", dto.color)
             .set("isDeleted", dto.isDeleted)
+            .set("isFinished", dto.isFinished)
             .set("shoppingItems", dto.shoppingItems)
 
         mongoTemplate.upsert(query, update, ShoppingList::class.java)
