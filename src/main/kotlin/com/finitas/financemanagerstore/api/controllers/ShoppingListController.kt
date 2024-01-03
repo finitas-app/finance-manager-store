@@ -12,13 +12,20 @@ import java.util.*
 @RequestMapping("api/store/shopping-lists")
 class ShoppingListController(private val service: ShoppingListService) {
 
-    @PutMapping("synchronize")
-    fun synchronize(
-        @Valid @RequestBody request: SynchronizationRequest<ShoppingListDto>,
+    @PutMapping
+    fun updateWithChangedItems(
+        @Valid @RequestBody request: IdUserWithEntities<ShoppingListDto>,
         errors: Errors
-    ): SynchronizationResponse<ShoppingListDto> {
+    ) {
         errors.validate()
-        return service.synchronize(request)
+        service.updateWithChangedItems(request)
+    }
+
+    @GetMapping
+    fun fetchUsersUpdates(@RequestBody request: List<IdUserWithVersion>): List<FetchUpdatesResponse<ShoppingListDto>> {
+        val result = service.fetchUsersUpdates(request)
+        println(result)
+        return result
     }
 
     @GetMapping("{idUser}")

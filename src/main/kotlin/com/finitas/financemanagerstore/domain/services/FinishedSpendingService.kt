@@ -1,8 +1,6 @@
 package com.finitas.financemanagerstore.domain.services
 
-import com.finitas.financemanagerstore.api.dto.FinishedSpendingDto
-import com.finitas.financemanagerstore.api.dto.SynchronizationRequest
-import com.finitas.financemanagerstore.api.dto.SynchronizationResponse
+import com.finitas.financemanagerstore.api.dto.*
 import com.finitas.financemanagerstore.config.ConflictException
 import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.NotFoundException
@@ -15,21 +13,17 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
-@Component
+@Service
+@Transactional
 class FinishedSpendingService(
     private val repository: FinishedSpendingRepository,
     private val mongoTemplate: MongoTemplate
 ) {
-
-    private fun isDeletedOnServerAndUpdatedOnClient(
-        dto: FinishedSpendingDto,
-        entity: FinishedSpending
-    ) =
-        !dto.isDeleted && entity.isDeleted
 
     private fun getMaxVersionFromDb(userId: UUID): Int {
         return repository.findByIdUser(
@@ -44,9 +38,7 @@ class FinishedSpendingService(
             .map { FinishedSpendingDto.fromEntity(it) }
     }
 
-    @Transactional
-    fun insert(dto: FinishedSpendingDto): Int {
-        val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
+    fun insert(dto: FinishedSpendingDto, newItemVersion: Int = getMaxVersionFromDb(dto.idUser) + 1): Int {
         try {
             repository.save(dto.toEntity(newItemVersion, UUID.randomUUID()))
         } catch (_: DuplicateKeyException) {
@@ -56,15 +48,13 @@ class FinishedSpendingService(
         return newItemVersion
     }
 
-    @Transactional
-    fun update(dto: FinishedSpendingDto): Int {
+    fun update(dto: FinishedSpendingDto, newItemVersion: Int = getMaxVersionFromDb(dto.idUser) + 1): Int {
         val entity = repository.findByIdUserAndIdSpendingSummary(
             dto.idUser,
             dto.idSpendingSummary
         )
             ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_EXISTS, "Finished spending not found")
 
-        val newItemVersion = getMaxVersionFromDb(dto.idUser) + 1
         val query = Query(
             Criteria.where("internalId").`is`(entity.internalId)
         )
@@ -80,7 +70,6 @@ class FinishedSpendingService(
         return newItemVersion
     }
 
-    @Transactional
     fun delete(idUser: UUID, idSpendingSummary: UUID): Int {
         val entity = repository.findByIdUserAndIdSpendingSummary(idUser, idSpendingSummary)
             ?: throw NotFoundException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending not found")
@@ -97,35 +86,36 @@ class FinishedSpendingService(
         return newVersion
     }
 
-    @Transactional
-    fun synchronize(dto: SynchronizationRequest<FinishedSpendingDto>): SynchronizationResponse<FinishedSpendingDto> {
-        val itemsChangedAfterLastSync = repository.findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
-        val serverChangedItemsAssociatedByIds =
-            itemsChangedAfterLastSync.associateBy { it.idSpendingSummary }
-
-        dto.objects
-            .filter {
-                val entityFromServer = serverChangedItemsAssociatedByIds[it.idSpendingSummary]
-                entityFromServer == null || (dto.isAuthorDataToUpdate && isDeletedOnServerAndUpdatedOnClient(
-                    it,
-                    entityFromServer
-                ))
-            }
+    fun updateWithChangedItems(dto: IdUserWithEntities<FinishedSpendingDto>) {
+        val currentMaxVersion = AtomicInteger(getMaxVersionFromDb(dto.idUser))
+        dto.changedValues
             .forEach {
                 val isExists = repository.existsByIdUserAndIdSpendingSummary(
                     idUser = it.idUser,
                     idSpendingSummary = it.idSpendingSummary
                 )
 
-                if (isExists) update(it)
-                else insert(it)
+                if (isExists) update(it, currentMaxVersion.incrementAndGet())
+                else insert(it, currentMaxVersion.incrementAndGet())
             }
+    }
 
-        return SynchronizationResponse(
-            actualizedSyncVersion = getMaxVersionFromDb(dto.idUser),
-            objects = repository
-                .findAllByIdUserAndVersionGreaterThan(dto.idUser, dto.lastSyncVersion)
-                .map { FinishedSpendingDto.fromEntity(it) }
-        )
+    fun fetchUsersUpdates(request: List<IdUserWithVersion>): List<FetchUpdatesResponse<FinishedSpendingDto>> {
+        return request.mapNotNull {
+            val updates = repository
+                .findAllByIdUserAndVersionGreaterThan(
+                    idUser = it.idUser,
+                    version = it.version
+                )
+                .map { entity -> FinishedSpendingDto.fromEntity(entity) }
+
+            updates.maxOfOrNull { update -> update.version }?.let { max ->
+                FetchUpdatesResponse(
+                    updates = updates,
+                    idUser = it.idUser,
+                    actualVersion = max
+                )
+            }
+        }
     }
 }

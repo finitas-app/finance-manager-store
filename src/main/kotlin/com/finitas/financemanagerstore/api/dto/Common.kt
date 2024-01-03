@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.MoneySerializer
 import com.finitas.financemanagerstore.domain.model.SpendingRecord
-import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import java.math.BigDecimal
 import java.util.*
@@ -18,17 +17,15 @@ data class ErrorResponse(
 
 data class UpdateResponse(val lastSyncVersion: Int)
 
-data class SynchronizationRequest<T>(
-    @field:Min(0, message = "lastSyncVersion should be a non negative integer")
-    val lastSyncVersion: Int,
+data class IdUserWithEntities<T> (
     val idUser: UUID,
-    val isAuthorDataToUpdate: Boolean,
-    val objects: List<T>
+    val changedValues: List<T>
 )
 
-data class SynchronizationResponse<T>(
-    val actualizedSyncVersion: Int,
-    val objects: List<T>
+data class FetchUpdatesResponse<T>(
+    val updates: List<T>,
+    val idUser: UUID,
+    val actualVersion: Int,
 )
 
 data class SpendingRecordDto(

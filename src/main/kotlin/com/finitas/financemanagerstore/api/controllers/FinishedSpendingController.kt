@@ -2,6 +2,7 @@ package com.finitas.financemanagerstore.api.controllers
 
 import com.finitas.financemanagerstore.api.dto.*
 import com.finitas.financemanagerstore.config.validate
+import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import com.finitas.financemanagerstore.domain.services.FinishedSpendingService
 import jakarta.validation.Valid
 import org.springframework.validation.Errors
@@ -12,13 +13,18 @@ import java.util.*
 @RequestMapping("api/store/finished-spendings")
 class FinishedSpendingController(private val service: FinishedSpendingService) {
 
-    @PutMapping("synchronize")
-    fun synchronize(
-        @Valid @RequestBody request: SynchronizationRequest<FinishedSpendingDto>,
+    @PutMapping
+    fun updateWithChangedItems(
+        @Valid @RequestBody request: IdUserWithEntities<FinishedSpendingDto>,
         errors: Errors
-    ): SynchronizationResponse<FinishedSpendingDto> {
+    ) {
         errors.validate()
-        return service.synchronize(request)
+        service.updateWithChangedItems(request)
+    }
+
+    @GetMapping
+    fun fetchUsersUpdates(@RequestBody request: List<IdUserWithVersion>): List<FetchUpdatesResponse<FinishedSpendingDto>> {
+        return service.fetchUsersUpdates(request)
     }
 
     @GetMapping("{idUser}")
