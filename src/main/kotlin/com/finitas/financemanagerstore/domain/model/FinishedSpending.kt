@@ -18,7 +18,7 @@ class SpendingRecord(
 @CompoundIndexes(
     CompoundIndex(
         name = "idUserWithIdSpendingSummary",
-        def = "{'spendingSummary.idSpendingSummary' : 1, 'idUser' : 1}",
+        def = "{'idSpendingSummary' : 1, 'idUser' : 1}",
         unique = true
     )
 )

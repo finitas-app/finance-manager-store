@@ -59,12 +59,12 @@ class ShoppingListService(
             Criteria.where("internalId").`is`(entity.internalId)
         )
         val update = Update()
-            .set("version", newItemVersion)
-            .set("name", dto.name)
-            .set("color", dto.color)
-            .set("isDeleted", dto.isDeleted)
-            .set("isFinished", dto.isFinished)
-            .set("shoppingItems", dto.shoppingItems)
+            .set(ShoppingList::version, newItemVersion)
+            .set(ShoppingList::name, dto.name)
+            .set(ShoppingList::color, dto.color)
+            .set(ShoppingList::isDeleted, dto.isDeleted)
+            .set(ShoppingList::isFinished, dto.isFinished)
+            .set(ShoppingList::shoppingItems, dto.shoppingItems.map { it.toEntity() })
 
         mongoTemplate.upsert(query, update, ShoppingList::class.java)
 
@@ -109,6 +109,7 @@ class ShoppingListService(
     fun updateWithChangedItems(request: IdUserWithEntities<ShoppingListDto>) {
         val currentMaxVersion = AtomicInteger(getMaxVersionFromDb(request.idUser))
         request.changedValues
+            .map { it.copy(idUser = request.idUser) }
             .forEach {
                 val isExists = repository.existsByIdUserAndIdShoppingList(
                     idUser = it.idUser,

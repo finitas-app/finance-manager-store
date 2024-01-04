@@ -1,6 +1,9 @@
 package com.finitas.financemanagerstore.domain.services
 
-import com.finitas.financemanagerstore.api.dto.*
+import com.finitas.financemanagerstore.api.dto.FetchUpdatesResponse
+import com.finitas.financemanagerstore.api.dto.FinishedSpendingDto
+import com.finitas.financemanagerstore.api.dto.IdUserWithEntities
+import com.finitas.financemanagerstore.api.dto.IdUserWithVersion
 import com.finitas.financemanagerstore.config.ConflictException
 import com.finitas.financemanagerstore.config.ErrorCode
 import com.finitas.financemanagerstore.config.NotFoundException
@@ -41,10 +44,10 @@ class FinishedSpendingService(
     fun insert(dto: FinishedSpendingDto, newItemVersion: Int = getMaxVersionFromDb(dto.idUser) + 1): Int {
         try {
             repository.save(dto.toEntity(newItemVersion, UUID.randomUUID()))
-        } catch (_: DuplicateKeyException) {
+        } catch (e: DuplicateKeyException) {
+            e.printStackTrace()
             throw ConflictException(ErrorCode.FINISHED_SPENDING_NOT_FOUND, "Finished spending already exists")
         }
-
         return newItemVersion
     }
 
@@ -59,11 +62,13 @@ class FinishedSpendingService(
             Criteria.where("internalId").`is`(entity.internalId)
         )
         val update = Update()
-            .set("version", newItemVersion)
-            .set("isDeleted", dto.isDeleted)
-            .set("idReceipt", dto.idReceipt)
-            .set("spendingSummary", dto)
-            .set("purchaseDate", dto.purchaseDate)
+            .set(FinishedSpending::spendingRecords, dto.spendingRecords.map { it.toEntity() })
+            .set(FinishedSpending::version, newItemVersion)
+            .set(FinishedSpending::isDeleted, dto.isDeleted)
+            .set(FinishedSpending::idReceipt, dto.idReceipt)
+            .set(FinishedSpending::idSpendingSummary, dto.idSpendingSummary)
+            .set(FinishedSpending::name, dto.name)
+            .set(FinishedSpending::purchaseDate, dto.purchaseDate)
 
         mongoTemplate.upsert(query, update, FinishedSpending::class.java)
 
@@ -89,6 +94,7 @@ class FinishedSpendingService(
     fun updateWithChangedItems(dto: IdUserWithEntities<FinishedSpendingDto>) {
         val currentMaxVersion = AtomicInteger(getMaxVersionFromDb(dto.idUser))
         dto.changedValues
+            .map { it.copy(idUser = it.idUser) }
             .forEach {
                 val isExists = repository.existsByIdUserAndIdSpendingSummary(
                     idUser = it.idUser,

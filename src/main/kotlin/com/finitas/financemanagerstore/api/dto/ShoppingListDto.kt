@@ -12,7 +12,7 @@ data class DeleteShoppingListRequest(
     val idUser: UUID,
 )
 
-class ShoppingListDto(
+data class ShoppingListDto(
     val idShoppingList: UUID,
     @field:Size(min = 1, message = "idShoppingList should not be empty")
     val shoppingItems: List<ShoppingItemDto>,

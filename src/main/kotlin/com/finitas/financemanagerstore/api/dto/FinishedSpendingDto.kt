@@ -12,7 +12,7 @@ data class DeleteFinishedSpendingRequest(
     val idUser: UUID,
 )
 
-class FinishedSpendingDto(
+data class FinishedSpendingDto(
     val idReceipt: UUID?,
     @field:Min(0, message = "purchaseDate should be a non negative long")
     val purchaseDate: Long,
@@ -48,6 +48,6 @@ class FinishedSpendingDto(
         idReceipt = idReceipt,
         name = name,
         spendingRecords = spendingRecords.map { it.toEntity() },
-        idSpendingSummary = idSpendingSummary
+        idSpendingSummary = idSpendingSummary,
     )
 }
