@@ -29,7 +29,6 @@ data class FetchUpdatesResponse<T>(
 )
 
 data class SpendingRecordDto(
-    val idSpendingRecord: UUID,
     val idSpendingRecordData: UUID,
     @field:NotBlank(message = "name should not be blank")
     val name: String,
@@ -39,7 +38,6 @@ data class SpendingRecordDto(
 ) {
     companion object {
         fun fromEntity(entity: SpendingRecord) = SpendingRecordDto(
-            idSpendingRecord = entity.idSpendingRecord,
             idSpendingRecordData = entity.idSpendingRecordData,
             name = entity.name,
             price = entity.price,
@@ -48,7 +46,6 @@ data class SpendingRecordDto(
     }
 
     fun toEntity() = SpendingRecord(
-        idSpendingRecord = idSpendingRecord,
         idSpendingRecordData = idSpendingRecordData,
         name = name,
         price = price,

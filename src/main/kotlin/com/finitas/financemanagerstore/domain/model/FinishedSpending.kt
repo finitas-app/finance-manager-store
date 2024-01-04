@@ -4,10 +4,10 @@ import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 
 class SpendingRecord(
-    val idSpendingRecord: UUID,
     val idSpendingRecordData: UUID,
     val name: String,
     val price: BigDecimal,
@@ -28,9 +28,8 @@ class FinishedSpending(
     idUser: UUID,
     isDeleted: Boolean,
     val idReceipt: UUID?,
-    val purchaseDate: Int,
+    val purchaseDate: Long,
     val idSpendingSummary: UUID,
-    val createdAt: Int,
     val name: String,
     val spendingRecords: List<SpendingRecord>,
 ) : AbstractSpending(

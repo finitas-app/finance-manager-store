@@ -23,9 +23,7 @@ class ShoppingListController(private val service: ShoppingListService) {
 
     @GetMapping
     fun fetchUsersUpdates(@RequestBody request: List<IdUserWithVersion>): List<FetchUpdatesResponse<ShoppingListDto>> {
-        val result = service.fetchUsersUpdates(request)
-        println(result)
-        return result
+        return service.fetchUsersUpdates(request)
     }
 
     @GetMapping("{idUser}")
