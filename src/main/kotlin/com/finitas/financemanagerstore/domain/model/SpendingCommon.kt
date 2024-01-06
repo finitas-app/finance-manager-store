@@ -9,3 +9,9 @@ open class AbstractSpending(
     val idUser: UUID,
     var isDeleted: Boolean,
 )
+
+enum class CurrencyValue {
+    PLN,
+    USD,
+    EUR
+}

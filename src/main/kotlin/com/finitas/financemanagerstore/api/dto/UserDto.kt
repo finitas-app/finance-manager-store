@@ -1,6 +1,7 @@
 package com.finitas.financemanagerstore.api.dto
 
 import com.finitas.financemanagerstore.domain.model.Category
+import com.finitas.financemanagerstore.domain.model.CurrencyValue
 import com.finitas.financemanagerstore.domain.model.RegularSpending
 import com.finitas.financemanagerstore.domain.model.User
 import jakarta.validation.constraints.Min
@@ -94,6 +95,7 @@ data class RegularSpendingDto(
     val periodUnit: Int,
     val lastActualizationDate: LocalDateTime,
     val idSpendingSummary: UUID,
+    val currency: CurrencyValue,
     @field:Min(1, message = "createdAt should be a positive integer")
     val createdAt: Int,
     @field:NotBlank(message = "name should not be blank")
@@ -109,7 +111,8 @@ data class RegularSpendingDto(
             createdAt = entity.createdAt,
             name = entity.name,
             spendingRecords = entity.spendingRecords.map { SpendingRecordDto.fromEntity(it) },
-            idSpendingSummary = entity.idSpendingSummary
+            idSpendingSummary = entity.idSpendingSummary,
+            currency = CurrencyValue.entries[entity.currency],
         )
     }
 
@@ -120,6 +123,7 @@ data class RegularSpendingDto(
         createdAt = createdAt,
         name = name,
         spendingRecords = spendingRecords.map { it.toEntity() },
-        idSpendingSummary = idSpendingSummary
+        idSpendingSummary = idSpendingSummary,
+        currency = currency.ordinal,
     )
 }

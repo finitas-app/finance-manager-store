@@ -1,10 +1,10 @@
 package com.finitas.financemanagerstore.api.dto
 
+import com.finitas.financemanagerstore.domain.model.CurrencyValue
 import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import java.time.LocalDateTime
 import java.util.*
 
 data class DeleteFinishedSpendingRequest(
@@ -19,6 +19,7 @@ data class FinishedSpendingDto(
     @field:Min(0, message = "version should be a non negative integer")
     val version: Int,
     val idUser: UUID,
+    val currency: CurrencyValue,
     val isDeleted: Boolean,
     val idSpendingSummary: UUID,
     @field:NotBlank(message = "name should not be blank")
@@ -35,6 +36,7 @@ data class FinishedSpendingDto(
             idReceipt = entity.idReceipt,
             name = entity.name,
             idSpendingSummary = entity.idSpendingSummary,
+            currency = CurrencyValue.entries[entity.currency],
             spendingRecords = entity.spendingRecords.map { SpendingRecordDto.fromEntity(it) },
         )
     }
@@ -49,5 +51,6 @@ data class FinishedSpendingDto(
         name = name,
         spendingRecords = spendingRecords.map { it.toEntity() },
         idSpendingSummary = idSpendingSummary,
+        currency = currency.ordinal,
     )
 }

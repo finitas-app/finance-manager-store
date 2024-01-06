@@ -17,7 +17,7 @@ data class ErrorResponse(
 
 data class UpdateResponse(val lastSyncVersion: Int)
 
-data class IdUserWithEntities<T> (
+data class IdUserWithEntities<T>(
     val idUser: UUID,
     val changedValues: List<T>
 )
