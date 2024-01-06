@@ -30,7 +30,7 @@ class FinishedSpending(
     val purchaseDate: Long,
     val idSpendingSummary: UUID,
     val name: String,
-    val currency: CurrencyValue,
+    val currency: Int,
     val spendingRecords: List<SpendingRecord>,
 ) : AbstractSpending(
     internalId = internalId,

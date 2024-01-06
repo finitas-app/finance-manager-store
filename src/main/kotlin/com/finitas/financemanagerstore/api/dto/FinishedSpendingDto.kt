@@ -36,7 +36,7 @@ data class FinishedSpendingDto(
             idReceipt = entity.idReceipt,
             name = entity.name,
             idSpendingSummary = entity.idSpendingSummary,
-            currency = entity.currency,
+            currency = CurrencyValue.entries[entity.currency],
             spendingRecords = entity.spendingRecords.map { SpendingRecordDto.fromEntity(it) },
         )
     }
@@ -51,6 +51,6 @@ data class FinishedSpendingDto(
         name = name,
         spendingRecords = spendingRecords.map { it.toEntity() },
         idSpendingSummary = idSpendingSummary,
-        currency = currency,
+        currency = currency.ordinal,
     )
 }

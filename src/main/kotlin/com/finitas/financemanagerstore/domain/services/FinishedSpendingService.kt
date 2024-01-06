@@ -68,6 +68,7 @@ class FinishedSpendingService(
             .set(FinishedSpending::idReceipt, dto.idReceipt)
             .set(FinishedSpending::idSpendingSummary, dto.idSpendingSummary)
             .set(FinishedSpending::name, dto.name)
+            .set(FinishedSpending::currency, dto.currency.ordinal)
             .set(FinishedSpending::purchaseDate, dto.purchaseDate)
 
         mongoTemplate.upsert(query, update, FinishedSpending::class.java)

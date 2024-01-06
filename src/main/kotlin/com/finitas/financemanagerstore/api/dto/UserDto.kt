@@ -112,7 +112,7 @@ data class RegularSpendingDto(
             name = entity.name,
             spendingRecords = entity.spendingRecords.map { SpendingRecordDto.fromEntity(it) },
             idSpendingSummary = entity.idSpendingSummary,
-            currency = entity.currency,
+            currency = CurrencyValue.entries[entity.currency],
         )
     }
 
@@ -124,6 +124,6 @@ data class RegularSpendingDto(
         name = name,
         spendingRecords = spendingRecords.map { it.toEntity() },
         idSpendingSummary = idSpendingSummary,
-        currency = currency,
+        currency = currency.ordinal,
     )
 }
