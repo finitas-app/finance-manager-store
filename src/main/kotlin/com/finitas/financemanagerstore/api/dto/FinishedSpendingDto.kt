@@ -1,5 +1,6 @@
 package com.finitas.financemanagerstore.api.dto
 
+import com.finitas.financemanagerstore.domain.model.CurrencyValue
 import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
@@ -18,7 +19,7 @@ data class FinishedSpendingDto(
     @field:Min(0, message = "version should be a non negative integer")
     val version: Int,
     val idUser: UUID,
-    val currency: Int,
+    val currency: CurrencyValue,
     val isDeleted: Boolean,
     val idSpendingSummary: UUID,
     @field:NotBlank(message = "name should not be blank")

@@ -1,6 +1,7 @@
 package com.finitas.financemanagerstore.api.dto
 
 import com.finitas.financemanagerstore.domain.model.Category
+import com.finitas.financemanagerstore.domain.model.CurrencyValue
 import com.finitas.financemanagerstore.domain.model.RegularSpending
 import com.finitas.financemanagerstore.domain.model.User
 import jakarta.validation.constraints.Min
@@ -94,7 +95,7 @@ data class RegularSpendingDto(
     val periodUnit: Int,
     val lastActualizationDate: LocalDateTime,
     val idSpendingSummary: UUID,
-    val currency: Int,
+    val currency: CurrencyValue,
     @field:Min(1, message = "createdAt should be a positive integer")
     val createdAt: Int,
     @field:NotBlank(message = "name should not be blank")
