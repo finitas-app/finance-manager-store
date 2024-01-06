@@ -23,6 +23,7 @@ data class RegularSpending(
     val idSpendingSummary: UUID,
     val createdAt: Int,
     val name: String,
+    val currency: Int,
     val spendingRecords: List<SpendingRecord>,
 )
 

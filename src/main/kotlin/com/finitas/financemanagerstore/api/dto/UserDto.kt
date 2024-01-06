@@ -94,6 +94,7 @@ data class RegularSpendingDto(
     val periodUnit: Int,
     val lastActualizationDate: LocalDateTime,
     val idSpendingSummary: UUID,
+    val currency: Int,
     @field:Min(1, message = "createdAt should be a positive integer")
     val createdAt: Int,
     @field:NotBlank(message = "name should not be blank")
@@ -109,7 +110,8 @@ data class RegularSpendingDto(
             createdAt = entity.createdAt,
             name = entity.name,
             spendingRecords = entity.spendingRecords.map { SpendingRecordDto.fromEntity(it) },
-            idSpendingSummary = entity.idSpendingSummary
+            idSpendingSummary = entity.idSpendingSummary,
+            currency = entity.currency,
         )
     }
 
@@ -120,6 +122,7 @@ data class RegularSpendingDto(
         createdAt = createdAt,
         name = name,
         spendingRecords = spendingRecords.map { it.toEntity() },
-        idSpendingSummary = idSpendingSummary
+        idSpendingSummary = idSpendingSummary,
+        currency = currency,
     )
 }

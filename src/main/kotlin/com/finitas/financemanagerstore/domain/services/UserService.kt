@@ -108,7 +108,7 @@ class UserService(private val repository: UserRepository) {
 
     fun getCategoriesFromVersion(syncCategoriesRequest: SyncCategoriesRequest): GetCategoriesFromVersionResponse {
         return syncCategoriesRequest.userVersions.map { categoryVersion ->
-            val user =repository.findById(categoryVersion.idUser).getOrNull() ?: return@map null
+            val user = repository.findById(categoryVersion.idUser).getOrNull() ?: return@map null
             if (user.spendingCategoryVersion == categoryVersion.version) return@map null
 
             UserWithCategoriesDto(

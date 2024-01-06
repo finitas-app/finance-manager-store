@@ -2,7 +2,6 @@ package com.finitas.financemanagerstore.api.controllers
 
 import com.finitas.financemanagerstore.api.dto.*
 import com.finitas.financemanagerstore.config.validate
-import com.finitas.financemanagerstore.domain.model.FinishedSpending
 import com.finitas.financemanagerstore.domain.services.FinishedSpendingService
 import jakarta.validation.Valid
 import org.springframework.validation.Errors
